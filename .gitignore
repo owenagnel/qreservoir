@@ -6,6 +6,9 @@ dmypy.json
 # unit tests
 .pytest_cache
 
+# scripts
+scripts/
+
 # Distribution / packaging
 .Python
 build/

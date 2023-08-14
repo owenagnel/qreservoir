@@ -23,7 +23,7 @@ class ExpEncoder(Encoder):
 
         for f in range(self.feature_num):
             for i in range(self.qubit_num):
-                rot_angle = 3 ** (i -1) * input_vect[f]
+                rot_angle = 3 ** (i - 1) * input_vect[f]
                 circuit.add_gate(RotX(i, rot_angle))
         return circuit
 

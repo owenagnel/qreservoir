@@ -26,6 +26,10 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 disallow_untyped_defs = true
 plugins = "numpy.typing.mypy_plugin"
+exclude = [
+    'scripts',  # TOML literal string (single-quotes, no escaping necessary)
+]
+
 
 [[tool.mypy.overrides]]
 module = ['qulacsvis.*', 'sklearn.base.*', 'sklearn.utils.*', 'sklearn.linear_model.*', 'sklearn.exceptions.*']
