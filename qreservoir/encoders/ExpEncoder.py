@@ -1,40 +1,34 @@
-from qulacs import QuantumCircuit, QuantumState
-import numpy as np
+from qulacs import QuantumCircuit, QuantumState, QuantumGateBase
+from qulacs.gate import CZ, RotX, RotY, RotZ
 from numpy.typing import NDArray
+import numpy as np
 from qulacsvis import circuit_drawer
-from qulacs.gate import CZ, RotX
 from qreservoir.encoders.Encoder import Encoder
 
 
-class HEEncoder(Encoder):
-    """Simple Hardware Effecient Encoder class. Implements a
-    reuploading stretegy using CZ and RX gates with a cyclic
-    entangling structure"""
+class ExpEncoder(Encoder):
+    """TODO: Write me"""
 
-    def __init__(self, input_size: int, depth: int) -> None:
-        self.feature_num = input_size
-        self.qubit_num = input_size
-        self.depth = depth
+    def __init__(self, qubit_num: int, feature_num: int = 0) -> None:
+        self.qubit_num = qubit_num
+        self.feature_num = feature_num
 
     def get_circuit(self, input_vect: NDArray[np.double]) -> QuantumCircuit:
         """Generates the parameterised circuit for the given input vector"""
+
         if len(input_vect) != self.feature_num:
             raise ValueError("Input size is not correct")
 
         circuit = QuantumCircuit(self.qubit_num)
 
-        for _ in range(self.depth):
+        for f in range(self.feature_num):
             for i in range(self.qubit_num):
-                circuit.add_gate(RotX(i, input_vect[i]))
-
-            for i in range(self.qubit_num - 1):
-                circuit.add_gate(CZ(i, i + 1))
-            if self.qubit_num > 1:
-                circuit.add_gate(CZ(self.qubit_num - 1, 0))
+                rot_angle = 3 ** (i -1) * input_vect[f]
+                circuit.add_gate(RotX(i, rot_angle))
         return circuit
 
     def get_encoding_state(self, input_vect: NDArray[np.double]) -> QuantumState:
-        """Returns the encoding state for the given input vector of shape (num_features,)"""
+        """Returns the encoding state for the given input vector of shape (feature_num,)"""
         state = QuantumState(self.qubit_num)
         state.set_zero_state()
         circuit = self.get_circuit(input_vect)
@@ -51,4 +45,5 @@ class HEEncoder(Encoder):
         circuit_drawer(circuit)
 
     def get_feature_num(self) -> int:
+        """Returns the input size of the encoder"""
         return self.feature_num

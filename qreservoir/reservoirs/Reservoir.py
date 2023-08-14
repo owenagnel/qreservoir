@@ -16,7 +16,7 @@ class Reservoir:
         ...
 
     @abstractmethod
-    def get_input_size(self) -> int:
+    def get_encoding_qubit_num(self) -> int:
         ...
 
     @abstractmethod

@@ -29,7 +29,7 @@ def test_one_layer_HEE_one_input() -> None:
     assert dot_product == pytest.approx(1)
 
 
-def test_incorrect_input_size_raises_error() -> None:
+def test_incorrect_feature_size_raises_error() -> None:
     encoder = HEEncoder(3, 1)
     input_vect = np.zeros(4)
     with pytest.raises(ValueError):

@@ -62,7 +62,7 @@ class RCModel:
         if self.reservoir.get_ancilla_num():
             prev = partial_trace(
                 output_state,
-                list(range(self.reservoir.get_input_size())),
+                list(range(self.reservoir.get_encoding_qubit_num())),
             )
         return expections, prev
 

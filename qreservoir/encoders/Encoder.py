@@ -18,5 +18,9 @@ class Encoder:
         ...
 
     @abstractmethod
+    def get_feature_num(self) -> int:
+        ...
+
+    @abstractmethod
     def print_circuit(self) -> None:
         ...

@@ -18,19 +18,19 @@ class CNOTReservoir(Reservoir):
         encoder: Union[Encoder, None],
         ancilla_num: int,
         depth: int,
-        input_size: int = 5,
+        enc_qubit_num: int = 5,
     ) -> None:
         """Initialises the reservoir with the correct number of qubits
         given an encoder and ancilla qubit number. If no encoder is provided,
-        input_size is used to initialise the reservoir.
+        enc_qubit_num is used to initialise the reservoir.
         """
 
         self.encoder = encoder
-        self.input_size = (
-            input_size if encoder is None else len(encoder)
-        )  # bit skecthy... maybe you should check if encoder is None and then set input_size to 0
+        self.enc_qubit_num = (
+            enc_qubit_num if encoder is None else len(encoder)
+        )  # bit skecthy... maybe you should check if encoder is None and then set enc_qubit_num to 0
         self.ancilla_num = ancilla_num
-        self.total_size = self.input_size + self.ancilla_num
+        self.total_size = self.enc_qubit_num + self.ancilla_num
         self.depth = depth
         self.dynamics_circuit = self.get_dynamics_circuit()
 
@@ -68,7 +68,7 @@ class CNOTReservoir(Reservoir):
 
             elif type(prev) == DensityMatrix:
                 # Cast encoding state as a density matrix
-                encoding_state_as_density_matrix = DensityMatrix(self.input_size)
+                encoding_state_as_density_matrix = DensityMatrix(self.enc_qubit_num)
                 encoding_state_as_density_matrix.load(encoding_state)
                 # Calculate tensor of both hidden and accessible systems
                 full_state = tensor_product(prev, encoding_state_as_density_matrix)
@@ -86,7 +86,7 @@ class CNOTReservoir(Reservoir):
 
     def connect_encoder(self, encoder: Encoder) -> None:
         """Connects an encoder to the reservoir."""
-        if len(encoder) != self.input_size:
+        if len(encoder) != self.enc_qubit_num:
             raise ValueError("Cannot switch with encoder of a different input size")
         self.encoder = encoder
 
@@ -102,6 +102,6 @@ class CNOTReservoir(Reservoir):
         """Returns the number of ancilla qubits"""
         return self.ancilla_num
 
-    def get_input_size(self) -> int:
+    def get_encoding_qubit_num(self) -> int:
         """Returns the number of input qubits"""
-        return self.input_size
+        return self.enc_qubit_num

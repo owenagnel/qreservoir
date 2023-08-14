@@ -30,7 +30,7 @@ from qreservoir.encoders.NoisyHEEncoder import NoisyHEEncoder
 #     assert dot_product == pytest.approx(1)
 
 
-# def test_incorrect_input_size_raises_error() -> None:
+# def test_incorrect_feature_size_raises_error() -> None:
 #     encoder = NoisyHEEncoder(3, 1)
 #     input_vect = np.zeros(4)
 #     with pytest.raises(ValueError):
