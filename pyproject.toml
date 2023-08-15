@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Python package for quantum reservoir computing using Qulacs"
 authors = ["Owen Agnel <owen.agnel@gmail.com>"]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
