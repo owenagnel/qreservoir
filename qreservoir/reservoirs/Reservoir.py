@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from qulacs import QuantumCircuit, QuantumState, DensityMatrix
 import numpy as np
 from typing import Union
@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from qreservoir.encoders.Encoder import Encoder
 
 
-class Reservoir:
+class Reservoir(ABC):
     @abstractmethod
     def get_dynamics_circuit(self) -> QuantumCircuit:
         ...

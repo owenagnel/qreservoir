@@ -8,7 +8,7 @@ dmypy.json
 
 # scripts
 scripts/
-
+outputs/
 # Distribution / packaging
 .Python
 build/

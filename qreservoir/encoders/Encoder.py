@@ -1,10 +1,10 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from qulacs import QuantumCircuit, QuantumState
 import numpy as np
 from numpy.typing import NDArray
 
 
-class Encoder:
+class Encoder(ABC):
     @abstractmethod
     def get_circuit(self, input_vect: NDArray[np.double]) -> QuantumCircuit:
         ...

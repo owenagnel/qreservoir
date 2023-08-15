@@ -20,6 +20,13 @@ black = "^23.7.0"
 mypy = "^1.5.0"
 
 
+[tool.poetry.group.scripts]
+optional = true
+
+[tool.poetry.group.scripts.dependencies]
+tqdm = "^4.66.1"
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
@@ -33,5 +40,5 @@ exclude = [
 
 
 [[tool.mypy.overrides]]
-module = ['qulacsvis.*', 'sklearn.base.*', 'sklearn.utils.*', 'sklearn.linear_model.*', 'sklearn.exceptions.*']
+module = ['qulacsvis.*', 'sklearn.*', 'matplotlib.*']
 ignore_missing_imports = true
