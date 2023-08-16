@@ -5,7 +5,7 @@
 
 Qreservoir is a lightweight python package built on top of qulacs to simulate quantum extreme learning and quantum reservoir computing models.
 
-Qreservoir is licensed under the [MIT license]().
+Qreservoir is licensed under the [MIT license](https://github.com/owenagnel/qreservoir/blob/main/LICENSE).
 
 ## Quick Install for Python
 

@@ -10,6 +10,8 @@ from numpy.typing import NDArray
 
 class MackeyGlass(Dataset):
     def __init__(self, size: int = 200) -> None:
+        """Warning: as this is a time series, y has shape (size, 1), rather than (size, ).
+        When passing things into sklearn, be careful of shapes of arrays."""
         self.size = size
         self.b = 0.05
         self.c = 0.15

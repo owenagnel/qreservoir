@@ -6,17 +6,15 @@ from typing import Tuple
 from numpy.typing import NDArray
 
 
-class Sine(Dataset):
-    def __init__(self, noise: float = 0.5, size: int = 200) -> None:
-        self.X, self.y = self.generate_data(noise=noise, size=size)
+class Random(Dataset):
+    def __init__(self, size: int = 200) -> None:
+        self.X, self.y = self.generate_data(size=size)
 
-    def generate_data(
-        self, noise: float = 0.5, size: int = 200
-    ) -> Tuple[NDArray[np.double], NDArray[np.double]]:
+    def generate_data(self, size: int) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
-        ys = np.sin(xs[:, 0])
-        ys += noise * 0.1 * np.random.normal(-1, 1, (size))
-        return xs, np.reshape(ys, (size, 1))
+        ys = np.random.uniform(0, 1, (size, 1))
+        print(xs.shape, ys.shape)
+        return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
@@ -38,5 +36,5 @@ class Sine(Dataset):
 
 
 if __name__ == "__main__":
-    d = Sine(noise=0.1, size=30)
+    d = Random()
     d.show()
