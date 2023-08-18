@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qreservoir"
-version = "0.1.1"
+version = "0.2.0"
 description = "Python package for quantum reservoir computing using Qulacs"
 authors = ["Owen Agnel <owen.agnel@gmail.com>"]
 readme = "README.md"
@@ -8,7 +8,7 @@ license = "MIT"
 repository = "https://github.com/owenagnel/qreservoir"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.10,<3.12"
 qulacs = "^0.6.1"
 matplotlib = "^3.7.2"
 colour = "^0.1.5"
