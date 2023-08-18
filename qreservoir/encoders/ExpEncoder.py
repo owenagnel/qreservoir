@@ -7,11 +7,17 @@ from qreservoir.encoders.Encoder import Encoder
 
 
 class ExpEncoder(Encoder):
-    """TODO: Write me"""
+    """Exponential Encoder class. Implements an expoential encoding scheme stretegy u
+    sing CZ and pauli-X rotation gates with a cyclic CZ entangling structure. Typically we
+    have multiple qubits per feature, and single depth."""
 
-    def __init__(self, qubit_num: int, feature_num: int = 0) -> None:
-        self.qubit_num = qubit_num
+    def __init__(
+        self, feature_num: int, depth: int = 1, qubits_per_feature: int = 1
+    ) -> None:
+        self.qubits_per_feature = qubits_per_feature
         self.feature_num = feature_num
+        self.qubit_num = qubits_per_feature * feature_num
+        self.depth = depth
 
     def get_circuit(self, input_vect: NDArray[np.double]) -> QuantumCircuit:
         """Generates the parameterised circuit for the given input vector"""
@@ -20,11 +26,15 @@ class ExpEncoder(Encoder):
             raise ValueError("Input size is not correct")
 
         circuit = QuantumCircuit(self.qubit_num)
-
-        for f in range(self.feature_num):
-            for i in range(self.qubit_num):
-                rot_angle = 3 ** (i - 1) * input_vect[f]
-                circuit.add_gate(RotX(i, rot_angle))
+        for _ in range(self.depth):
+            for f in range(self.feature_num):
+                for i in range(self.qubits_per_feature):
+                    rot_angle = 3 ** (i - 1) * input_vect[f]
+                    circuit.add_gate(RotX(i, rot_angle))
+            for i in range(self.qubit_num - 1):
+                circuit.add_gate(CZ(i, i + 1))
+            if self.qubit_num > 1:
+                circuit.add_gate(CZ(self.qubit_num - 1, 0))
         return circuit
 
     def get_encoding_state(self, input_vect: NDArray[np.double]) -> QuantumState:

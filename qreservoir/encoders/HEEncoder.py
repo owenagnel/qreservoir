@@ -11,9 +11,12 @@ class HEEncoder(Encoder):
     reuploading stretegy using CZ and RX gates with a cyclic
     entangling structure"""
 
-    def __init__(self, input_size: int, depth: int) -> None:
-        self.feature_num = input_size
-        self.qubit_num = input_size
+    def __init__(
+        self, feature_num: int, depth: int = 1, qubits_per_feature: int = 1
+    ) -> None:
+        self.feature_num = feature_num
+        self.qubit_num = feature_num * qubits_per_feature
+        self.qubits_per_feature = qubits_per_feature
         self.depth = depth
 
     def get_circuit(self, input_vect: NDArray[np.double]) -> QuantumCircuit:
@@ -24,8 +27,11 @@ class HEEncoder(Encoder):
         circuit = QuantumCircuit(self.qubit_num)
 
         for _ in range(self.depth):
-            for i in range(self.qubit_num):
-                circuit.add_gate(RotX(i, input_vect[i]))
+            for i in range(self.feature_num):
+                # In the case there are multiple encoding qubits per feature
+                for j in range(self.qubits_per_feature):
+                    qubit_acted_on = i * self.qubits_per_feature + j
+                    circuit.add_gate(RotX(qubit_acted_on, input_vect[i]))
 
             for i in range(self.qubit_num - 1):
                 circuit.add_gate(CZ(i, i + 1))

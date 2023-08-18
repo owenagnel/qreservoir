@@ -9,11 +9,14 @@ from qreservoir.encoders.Encoder import Encoder
 class CHEEncoder(Encoder):
     """Simple Hardware Effecient Encoder class. Implements a
     reuploading stretegy using CZ and random pauli rotation gates
-    with a non-cyclic entangling structure"""
+    with a cyclic entangling structure. Optionally multpile qubits per feature."""
 
-    def __init__(self, input_size: int, depth: int) -> None:
-        self.feature_num = input_size
-        self.qubit_num = input_size
+    def __init__(
+        self, feature_num: int, depth: int = 1, qubits_per_feature: int = 1
+    ) -> None:
+        self.feature_num = feature_num
+        self.qubit_num = feature_num * qubits_per_feature
+        self.qubits_per_feature = qubits_per_feature
         self.depth = depth
         # generates fixed random rotation axis for each qubit and depth
         self.gates = ["X", "Y", "Z"]
@@ -28,14 +31,17 @@ class CHEEncoder(Encoder):
         circuit = QuantumCircuit(self.qubit_num)
 
         for d in range(self.depth):
-            for i in range(self.qubit_num):
-                gate = self.get_random_gate(i, input_vect[i], d)
-                circuit.add_gate(gate)
+            for i in range(self.feature_num):
+                # In the case there are multiple encoding qubits per feature
+                for j in range(self.qubits_per_feature):
+                    qubit_acted_on = i * self.qubits_per_feature + j
+                    gate = self.get_random_gate(qubit_acted_on, input_vect[i], d)
+                    circuit.add_gate(gate)
 
             for i in range(self.qubit_num - 1):
                 circuit.add_gate(CZ(i, i + 1))
-            # Uncomment the following line to make the circuit cyclic
-            # circuit.add_gate(CZ(self.qubit_num-1, 0))
+            if self.qubit_num > 1:
+                circuit.add_gate(CZ(self.qubit_num - 1, 0))
         return circuit
 
     def get_random_gate(self, qubit: int, angle: int, depth: int) -> QuantumGateBase:
