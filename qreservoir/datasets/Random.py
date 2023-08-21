@@ -13,7 +13,6 @@ class Random(Dataset):
     def generate_data(self, size: int) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
         ys = np.random.uniform(0, 1, (size, 1))
-        print(xs.shape, ys.shape)
         return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
