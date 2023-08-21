@@ -22,7 +22,6 @@ def test_QELModel_sizes_1dim() -> None:
     model.fit(X, y)
     X_test = np.zeros((30, 1))
     out = model.predict(X_test)
-    print(out)
     assert out.shape == (30,)
     assert out == pytest.approx(np.zeros((30,)))
 
