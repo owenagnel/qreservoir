@@ -2,11 +2,10 @@ import numpy as np
 from qulacs import DensityMatrix, Observable
 from qulacs.state import partial_trace
 from qreservoir.reservoirs.Reservoir import Reservoir
-from typing import List, Optional
+from typing import List, Optional, Tuple, cast
 from numpy.typing import NDArray
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
-from typing import Any, Tuple
 
 
 class RCModel:
@@ -33,22 +32,37 @@ class RCModel:
             self.initial_state.set_zero_state()
 
     def calculate_observables_for_sequence(
-        self, input_seq: NDArray[np.double]
+        self, input_seq: NDArray[np.double], index: Optional[int] = None
     ) -> NDArray[np.double]:
         """Takes a (n_samples, n_features) dimensional input sequence and returns an
-        (n_samples, n_observables) array of observable values"""
+        (n_samples, n_observables) array of observable values. If index is specified,
+        only the observable values for the indexth sample will be returned."""
+
+        if index and (index < 0 or index >= len(input_seq)):
+            raise ValueError("index must be between 0 and len(input_seq) - 1")
 
         results = []
         prev = self.initial_state
 
-        for sequent in input_seq:
-            expections, prev = self.calculate_next_observable_list(sequent, prev)
-            results.append(expections)
+        for step, sequent in enumerate(input_seq):
+            if index is None:
+                expections, prev = self.next_reservoir_state_with_observables(
+                    prev, sequent
+                )
+                results.append(expections)
+            elif step == index:
+                expections, prev = self.next_reservoir_state_with_observables(
+                    prev, sequent
+                )
+                results.append(expections)
+                break  # all further reservoir states aren't needed
+            else:
+                prev = self.next_reservoir_state(prev, sequent)
 
         return np.array(results)
 
-    def calculate_next_observable_list(
-        self, sequent: NDArray[np.double], prev: DensityMatrix
+    def next_reservoir_state_with_observables(
+        self, prev: DensityMatrix, sequent: NDArray[np.double]
     ) -> Tuple[NDArray[np.double], DensityMatrix]:
         """Calculates the next state of the reservoir and the list of observable values"""
 
@@ -66,11 +80,23 @@ class RCModel:
             )
         return expections, prev
 
+    def next_reservoir_state(
+        self, prev: DensityMatrix, sequent: NDArray[np.double]
+    ) -> DensityMatrix:
+        """Calculates only the next state of the reservoir"""
+        output_state = self.reservoir.get_reservoir_state(sequent, prev)
+        if self.reservoir.get_ancilla_num():
+            prev = partial_trace(
+                output_state,
+                list(range(self.reservoir.get_encoding_qubit_num())),
+            )
+        else:
+            prev = cast(DensityMatrix, output_state)  # should never happen
+        return prev
+
     def fit(
         self, X: NDArray[np.double]
-    ) -> (
-        None
-    ):  # TODO, maybe allow for multiple sequence to be input, for more training data
+    ) -> None:  # TODO, allow for multiple sequence to be input, for more training data
         """X is an array_like of (n_samples, n_features), fit trains a model to
         predict the next value of the time series."""
 
@@ -96,7 +122,7 @@ class RCModel:
         outputs = []
         prev = self.initial_state
         for x in X_queue:
-            expections, prev = self.calculate_next_observable_list(x, prev)
+            expections, prev = self.next_reservoir_state_with_observables(prev, x)
             # we must wrap expectations in a list because predict expects a 2d array,
             # and is not meant for time series predictions. Moreover, we must then
             # extract the first element out of the list because our subestimator is

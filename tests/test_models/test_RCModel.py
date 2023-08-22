@@ -73,7 +73,7 @@ def test_tracing_out_ancilla() -> None:
 
     prev = DensityMatrix(3)
     prev.set_Haar_random_state()
-    expect, prev2 = model.calculate_next_observable_list(np.array([0, 0]), prev)
+    expect, prev2 = model.next_reservoir_state_with_observables(prev, np.array([0, 0]))
 
     assert prev.get_matrix() == pytest.approx(prev2.get_matrix())
     assert expect[0] == pytest.approx(
@@ -123,8 +123,8 @@ def test_observable_calculation() -> None:
     model = RCModel(reservoir, observables, LinearRegression())
     prev = DensityMatrix(1)
     prev.set_computational_basis(1)
-    expectations, new_prev = model.calculate_next_observable_list(
-        np.random.uniform(-np.pi, np.pi, (1)), prev
+    expectations, new_prev = model.next_reservoir_state_with_observables(
+        prev, np.random.uniform(-np.pi, np.pi, (1))
     )  # the input data doesn't matter since encoder has depth 0
     assert expectations.shape == (2,)
     assert expectations[0] == pytest.approx(-1)  # anc
