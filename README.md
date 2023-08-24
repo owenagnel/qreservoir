@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/logo.png" width="50%"/>
+  <img src="docs/logo.png" width="25%"/>
 </p>
 
 # Qreservoir
