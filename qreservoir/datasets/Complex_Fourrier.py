@@ -10,7 +10,7 @@ class Complex_Fourrier(Dataset):
     def __init__(
         self, noise: float = 0.5, size: int = 200, complexity: int = 5
     ) -> None:
-        "Generates a fourrier series with constant frequency coefficients and 2 ^ complexity terms"
+        "Generates a fourrier series with random frequency coefficients and `complexity` terms"
         self.random_coef = np.random.uniform(-1, 1, (complexity, 2))
         self.X, self.y = self.generate_data(
             noise=noise, size=size, complexity=complexity

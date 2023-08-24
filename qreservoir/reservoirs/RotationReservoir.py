@@ -3,27 +3,60 @@ from qulacs.state import tensor_product
 from qulacs.gate import RotX, RotY, RotZ, CZ
 import numpy as np
 from numpy.typing import NDArray
-from typing import Union, cast
+from typing import Union, cast, Optional
 from qulacsvis import circuit_drawer
 from qreservoir.encoders.Encoder import Encoder
 from qreservoir.reservoirs.Reservoir import Reservoir
 
 
 class RotationReservoir(Reservoir):
-    """The RandomReservoir class simulates a reservoir with random dynamics.
+    r"""The RandomReservoir class simulates a reservoir with random dynamics.
     The reservoir is made up of random rotations and CZ gates in a cyclic
-    entangling structure"""
+    entangling structure.
+    
+    The reservoir structure is:
+    .. math:: \prod_{l=1}^d W V(\mathbf{k}_l, \mathbf{\theta}_l)
+
+    with
+
+    .. math:: W = \text{C-Phase}_{N,1} \times \prod_{i=1}^{n-1} \text{C-Phase}_{i,i+1}
+
+    and
+
+    .. math:: V(\mathbf{k}_l, \mathbf{\theta}_l) = \prod_{i=1}^n R_{k_i^l}(\theta_i^l)
+
+    Where :math:`R_{k_i^l}(\theta_i^l)` is a rotation of the :math:`i`th qubit by an angle :math:`\theta_i^l`
+    about the :math:`k_i^l = x, y` or :math:`z` axis.
+    """
 
     def __init__(
         self,
-        encoder: Union[Encoder, None],
+        encoder: Optional[Encoder],
         ancilla_num: int,
         depth: int,
         enc_qubit_num: int = 5,
     ) -> None:
-        """Initialises the reservoir with the correct number of qubits
+        r"""Initialises the reservoir with the correct number of qubits
         given an encoder and ancilla qubit number. If no encoder is provided,
-        enc_qubit_num is used to initialise the reservoir.
+        `enc_qubit_num` is used to initialise the reservoir.
+
+        Parameters
+        ----------
+        encoder : Encoder, optional
+            An encoder object to be used in tandem with the reservoir.
+        ancilla_num : int
+            The number of qubits in the hidden space of our reservoir. 
+            These qubits qre unaffected by the input data before the reservoir 
+            dynamics take place. In a reservoir model they are what allows for the memory property.
+        depth : int
+            Depth of the reservoir.
+
+        Other Parameters
+        ----------------
+        enc_qubit_num : int, optional
+            Infrequently used paramter to manually specify encoding qubit number. 
+            Allows us to initialise the reservoir without an encoder. If an encoder is provided, this
+            argument is ignored.
         """
 
         self.encoder = encoder
