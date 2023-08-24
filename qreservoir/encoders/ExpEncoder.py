@@ -23,7 +23,9 @@ class ExpEncoder(Encoder):
         """Generates the parameterised circuit for the given input vector"""
 
         if len(input_vect) != self.feature_num:
-            raise ValueError(f"Input size is not correct. Expecting vector of size ({self.feature_num},) but got vector of size {input_vect.shape}")
+            raise ValueError(
+                f"Input size is not correct. Expecting vector of size ({self.feature_num},) but got vector of size {input_vect.shape}"
+            )
 
         circuit = QuantumCircuit(self.qubit_num)
         for _ in range(self.depth):

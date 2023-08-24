@@ -13,7 +13,7 @@ class RotationReservoir(Reservoir):
     r"""The RandomReservoir class simulates a reservoir with random dynamics.
     The reservoir is made up of random rotations and CZ gates in a cyclic
     entangling structure.
-    
+
     The reservoir structure is:
     .. math:: \prod_{l=1}^d W V(\mathbf{k}_l, \mathbf{\theta}_l)
 
@@ -45,8 +45,8 @@ class RotationReservoir(Reservoir):
         encoder : Encoder, optional
             An encoder object to be used in tandem with the reservoir.
         ancilla_num : int
-            The number of qubits in the hidden space of our reservoir. 
-            These qubits qre unaffected by the input data before the reservoir 
+            The number of qubits in the hidden space of our reservoir.
+            These qubits qre unaffected by the input data before the reservoir
             dynamics take place. In a reservoir model they are what allows for the memory property.
         depth : int
             Depth of the reservoir.
@@ -54,7 +54,7 @@ class RotationReservoir(Reservoir):
         Other Parameters
         ----------------
         enc_qubit_num : int, optional
-            Infrequently used paramter to manually specify encoding qubit number. 
+            Infrequently used paramter to manually specify encoding qubit number.
             Allows us to initialise the reservoir without an encoder. If an encoder is provided, this
             argument is ignored.
         """
