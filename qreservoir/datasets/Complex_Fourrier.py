@@ -11,7 +11,7 @@ class Complex_Fourrier(Dataset):
         self, noise: float = 0.5, size: int = 200, complexity: int = 5
     ) -> None:
         "Generates a fourrier series with constant frequency coefficients and 2 ^ complexity terms"
-        self.random_coef = np.random.uniform(-1, 1, (2**complexity, 2))
+        self.random_coef = np.random.uniform(-1, 1, (complexity, 2))
         self.X, self.y = self.generate_data(
             noise=noise, size=size, complexity=complexity
         )
@@ -25,7 +25,7 @@ class Complex_Fourrier(Dataset):
             ys = np.add(self.random_coef[i][0] * np.sin(i * xs[:, 0]), ys)
             ys = np.add(self.random_coef[i][1] * np.cos(i * xs[:, 0]), ys)
         ys += noise * 0.1 * np.random.normal(-1, 1, (size))
-        return xs, np.reshape(ys, (size, 1))
+        return xs, np.reshape(ys, (size,))
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         return train_test_split(self.X, self.y, test_size=test_size, random_state=42)

@@ -2,12 +2,14 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 import numpy as np
 from qreservoir.datasets.Dataset import Dataset, TrainTestSplit
-from typing import Tuple
+from typing import Tuple, Optional
 from numpy.typing import NDArray
 
 
 class Random(Dataset):
-    def __init__(self, size: int = 200) -> None:
+    def __init__(self, size: int = 200, seed: Optional[int] = None) -> None:
+        if seed:
+            np.random.seed(seed)
         self.X, self.y = self.generate_data(size=size)
 
     def generate_data(self, size: int) -> Tuple[NDArray[np.double], NDArray[np.double]]:

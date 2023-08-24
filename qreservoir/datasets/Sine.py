@@ -16,7 +16,7 @@ class Sine(Dataset):
         xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
         ys = np.sin(xs[:, 0])
         ys += noise * 0.1 * np.random.normal(-1, 1, (size))
-        return xs, np.reshape(ys, (size, 1))
+        return xs, np.reshape(ys, (size,))
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
