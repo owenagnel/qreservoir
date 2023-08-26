@@ -11,6 +11,7 @@ class Random(Dataset):
         if seed:
             np.random.seed(seed)
         self.X, self.y = self.generate_data(size=size)
+        np.random.seed()
 
     def generate_data(self, size: int) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
