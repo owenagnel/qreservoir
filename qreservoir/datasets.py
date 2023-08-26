@@ -1,9 +1,7 @@
 from abc import abstractmethod, ABC
 from typing import Tuple, Optional
-from numpy.typing import NDArray
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
+from numpy.typing import NDArray
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_circles, make_classification, make_moons
 
@@ -18,125 +16,215 @@ class Dataset(ABC):
     def get_train_test(self, test_size: float) -> TrainTestSplit:
         ...
 
-    @abstractmethod
-    def show(self) -> None:
-        ...
-
 
 class Circles(Dataset):
+    """A circles classification dataset. `X` is an array of shape `(size, 2)`
+    and `y` is an array of shape `(size,)` containing labels. Returns the scikit-learn
+    make_circles dataset with the passed parameters."""
+
+    noise: float
+    """The noise parameter passed to scikit-learn make_circles."""
+
+    size: int
+    """The size parameter is the number of data points to generate."""
+
     def __init__(self, noise: float = 0.5, size: int = 200) -> None:
-        self.X, self.y = make_circles(noise=noise, factor=0.3, n_samples=size)
+        r"""Initialises the dataset object with passed parameters.
+
+        Parameters
+        ----------
+        size : float, optional
+            The number of data points to generate. The default is 200.
+        noise : float, optional
+            The noise passed to scikit-learn make_circles. The default is 0.5.
+        """
+        self.noise = noise
+        self.size = size
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
-
-    def show(self) -> None:
-        x_min, x_max = self.X[:, 0].min() - 0.5, self.X[:, 0].max() + 0.5
-        y_min, y_max = self.X[:, 1].min() - 0.5, self.X[:, 1].max() + 0.5
-
-        # just plot the dataset first
-        cm_bright = ListedColormap(["#FF0000", "#0000FF"])
-        plt.title("Input data")
-
-        # Plot the training points
-        plt.scatter(
-            self.X[:, 0], self.X[:, 1], c=self.y, cmap=cm_bright, edgecolors="k"
-        )
-
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
-
-
-class Complex_Fourrier(Dataset):
-    def __init__(
-        self, noise: float = 0.5, size: int = 200, complexity: int = 5
-    ) -> None:
-        "Generates a fourrier series with random frequency coefficients and `complexity` terms"
-        self.random_coef = np.random.uniform(-1, 1, (complexity, 2))
-        self.X, self.y = self.generate_data(
-            noise=noise, size=size, complexity=complexity
-        )
-
-    def generate_data(
-        self, noise: float, size: int, complexity: int
-    ) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
-        ys = np.zeros(size)
-        for i in range(complexity):
-            ys = np.add(self.random_coef[i][0] * np.sin(i * xs[:, 0]), ys)
-            ys = np.add(self.random_coef[i][1] * np.cos(i * xs[:, 0]), ys)
-        ys += noise * 0.1 * np.random.normal(-1, 1, (size))
-        return xs, np.reshape(ys, (size,))
-
-    def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
-
-    def show(self) -> None:
-        x_min, x_max = self.X.min() - 0.5, self.X.max() + 0.5
-        y_min, y_max = self.y.min() - 0.5, self.y.max() + 0.5
-
-        # just plot the dataset first
-
-        # Plot the training points
-        plt.scatter(self.X[:, 0], self.y[:, 0], edgecolors="k")
-
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
+        """Returns a train test split of the data."""
+        X, y = make_circles(noise=self.noise, factor=0.3, n_samples=self.size)
+        return train_test_split(X, y, test_size=test_size, random_state=42)
 
 
 class LinearlySeperable(Dataset):
+    """A linearly seperable classification dataset. `X` is an array of shape `(size, 2)` 
+    and `y` is an array of shape `(size,)` containing labels. Returns the scikit-learn 
+    make_classification dataset with the passed parameters. Noise is added to the dataset via
+    a multivariqte gaussian."""
+    
+    noise: float
+    """The magnitude of noise we add."""
+
+    size: int
+    """The size parameter is the number of data points to generate."""
+
     def __init__(self, noise: float = 0.5, size: int = 200) -> None:
-        self.X, self.y = make_classification(
+        r"""Initialises the dataset object with passed parameters.
+
+        Parameters
+        ----------
+        size : float, optional
+            The number of data points to generate. The default is 200.
+        noise : float, optional
+            The noise factor we multiply the gaussian noise by. The default is 0.5.
+        """
+        self.noise = noise
+        self.size = size
+
+    def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
+        """Returns a train test split of the data."""
+        X,y = make_classification(
             n_features=2,
             n_redundant=0,
             n_informative=2,
             n_clusters_per_class=1,
-            n_samples=size,
+            n_samples=self.size,
         )
-        rng = np.random.RandomState(2)
-        self.X += 4 * noise * rng.uniform(size=self.X.shape)
-        self.linearly_separable = (self.X, self.y)
+        rng = np.random.RandomState()
+        X += 4 * self.noise * rng.uniform(size=X.shape)
+        return train_test_split(X, y, test_size=test_size)
+
+class Moons(Dataset):
+    """A moons classification dataset. `X` is an array of shape `(size, 2)` 
+    and `y` is an array of shape `(size,)` containing labels.
+    Returns the scikit-learn make_moons dataset with the passed parameters."""
+
+    noise: float
+    """The noise parameter passed to scikit-learn make_moons."""
+
+    size: int
+    """The size parameter is the number of data points to generate."""
+
+    def __init__(self, noise: float = 0.2, size: int = 200) -> None:
+        r"""Initialises the dataset object with passed parameters.
+
+        Parameters
+        ----------
+        size : float, optional
+            The number of data points to generate. The default is 200.
+        noise : float, optional
+            The noise passed to scikit-learn make_moons. The default is 0.2.
+        """
+        self.noise = noise
+        self.size = size
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
+        X, y = make_moons(noise=self.noise, n_samples=self.size)
+        return train_test_split(X, y, test_size=test_size)
+    
+class Complex_Fourrier(Dataset):
+    r"""A truncated random fourrier series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
+    `X` is a linspace between 0 and :math: `2 \pi`, and `y` is :math: `f(x)` for a given :math: `x`.
+    
+    .. math:: f(x) = sum_{i=0}^{\text{complexity}} a_i sin(i x) + b_i cos(i x)
 
-    def show(self) -> None:
-        x_min, x_max = self.X[:, 0].min() - 0.5, self.X[:, 0].max() + 0.5
-        y_min, y_max = self.X[:, 1].min() - 0.5, self.X[:, 1].max() + 0.5
+    Where :math: `\mathbb{a}` and :math: `\mathbb{b}` are vectors of uniformly distributed random coefficients between -1 and 1.
+    """
 
-        # just plot the dataset first
-        cm_bright = ListedColormap(["#FF0000", "#0000FF"])
-        plt.title("Input data")
+    noise: float
+    """The noise parameter is the standard deviation of the gaussian noise added to the fourrier series."""
 
-        # Plot the training points
-        plt.scatter(
-            self.X[:, 0], self.X[:, 1], c=self.y, cmap=cm_bright, edgecolors="k"
-        )
+    size: int
+    """The size parameter is the number of data points to generate."""
 
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
+    complexity: int
+    """The complexity parameter is the number of cos and sin terms in the fourrier series."""
+
+    seed: Optional[int]
+    """The seed parameter makes data generation deterministic. If None, the seed is not set."""
+
+    def __init__(
+        self, noise: float = 0.5, size: int = 200, complexity: int = 5, seed: Optional[int] = None
+    ) -> None:
+        r"""Initialises the dataset object with passed parameters.
+
+        Parameters
+        ----------
+        size : float, optional
+            The number of data points to generate. The default is 200.
+        noise : float, optional
+            The standard deviation of noise to add to the fourrier series. The default is 0.5.
+        complexity : int, optional
+            The number of terms in the fourrier series. The default is 5.
+
+        Other Parameters
+        ----------------
+        seed : int, optional
+            Seed parameter to make data generation deterministic. The default is None.
+        """
+        self.noise = noise
+        self.size = size
+        self.complexity = complexity
+        self.seed = seed
+
+
+    def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
+        """Generates a truncated random fourrier series."""
+        if self.seed:
+            np.random.seed(self.seed)
+        self.random_coef = np.random.uniform(-1, 1, (self.complexity, 2))
+        xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
+        ys = np.zeros(self.size)
+        for i in range(self.complexity):
+            ys = np.add(self.random_coef[i][0] * np.sin(i * xs[:, 0]), ys)
+            ys = np.add(self.random_coef[i][1] * np.cos(i * xs[:, 0]), ys)
+        ys += np.random.normal(0, self.noise, (self.size))
+        np.random.seed() # rerandomise seed
+        return xs, np.reshape(ys, (self.size, 1))
+
+    def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
+        """Returns a train test split of the data."""
+        X, y = self.generate_data()
+        return train_test_split(X, y, test_size=test_size, random_state=42)
 
 
 class MackeyGlass(Dataset):
-    def __init__(self, size: int = 200) -> None:
-        """Warning: as this is a time series, y has shape (size, 1), rather than (size, ).
-        When passing things into sklearn, be careful of shapes of arrays."""
+    """A MackeyGlass time series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`. 
+    `X` is a linspace between 0 and 10, and `y` is the correspecding MackeyGlass value at that time step"""
+
+    size: int
+    """The size parameter is the number of data points to generate."""
+
+    b: float
+    """
+    @private
+    The b parameter is a constant in the MackeyGlass equation."""
+
+    c: float
+    """
+    @private
+    The c parameter is a constant in the MackeyGlass equation."""
+
+    tau: int
+    """
+    @private
+    The tau parameter is a constant in the MackeyGlass equation. Depth of history."""
+
+    def __init__(self, size: int = 200, b: float = 0.05, c: float = 0.15, tau: int = 20) -> None:
+        r"""Initialises the dataset object with passed parameters.
+
+        Parameters
+        ----------
+        size : float, optional
+            The number of data points to generate. The default is 200.
+
+        Other Parameters
+        ----------------
+        b : float, optional
+            The b parameter is a constant in the MackeyGlass equation. The default is 0.05.
+        c : float, optional
+            The c parameter is a constant in the MackeyGlass equation. The default is 0.15.
+        tau : int, optional
+            The tau parameter is a constant in the MackeyGlass equation. Depth of history. The default is 20.
+        """
         self.size = size
-        self.b = 0.05
-        self.c = 0.15
-        self.tau = 20
-        self.X, self.y = self.generate_data()
+        self.b = b
+        self.c = c
+        self.tau = tau
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
+        """Generates a MackeyGlass time series."""
         start_val_num = 1 + self.tau
         y = list(np.random.uniform(0.95, 1.05, start_val_num))
         for n in range(start_val_num - 1, self.size + 99):
@@ -148,111 +236,88 @@ class MackeyGlass(Dataset):
                 )
             )
         y = y[100:]
-        return np.linspace(0, 10, self.size), np.reshape(np.array(y), (self.size, 1))
+        return np.reshape(np.linspace(0, 10, self.size), (self.size, 1)), np.reshape(np.array(y), (self.size, 1))
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
-
-    def show(self) -> None:
-        x_min, x_max = self.X.min() - 0.5, self.X.max() + 0.5
-        y_min, y_max = self.y.min() - 0.5, self.y.max() + 0.5
-
-        # just plot the dataset first
-
-        # Plot the training points
-        plt.scatter(self.X, self.y[:, 0], edgecolors="k")
-
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
-
-
-class Moons(Dataset):
-    def __init__(self, noise: float = 0.2, size: int = 200) -> None:
-        self.X, self.y = make_moons(noise=noise, n_samples=size)
-
-    def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
-
-    def show(self) -> None:
-        x_min, x_max = self.X[:, 0].min() - 0.5, self.X[:, 0].max() + 0.5
-        y_min, y_max = self.X[:, 1].min() - 0.5, self.X[:, 1].max() + 0.5
-
-        # just plot the dataset first
-        cm_bright = ListedColormap(["#FF0000", "#0000FF"])
-        plt.title("Input data")
-
-        # Plot the training points
-        plt.scatter(
-            self.X[:, 0], self.X[:, 1], c=self.y, cmap=cm_bright, edgecolors="k"
-        )
-
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
+        """Returns a train test split of the data."""
+        X, y = self.generate_data()
+        return train_test_split(X, y, test_size=test_size, random_state=42)
 
 
 class Random(Dataset):
-    def __init__(self, size: int = 200, seed: Optional[int] = None) -> None:
-        if seed:
-            np.random.seed(seed)
-        self.X, self.y = self.generate_data(size=size)
-        np.random.seed()
+    """A random regression dataset of uniformly uniform distribution between 0 and 1. Both `X` and `y` are 
+    2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math: `2 \pi`, and `y` is a random uniform."""
 
-    def generate_data(self, size: int) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
-        ys = np.random.uniform(0, 1, (size, 1))
+    seed: Optional[int]
+    """The seed parameter makes data generation deterministic. If None, the seed is not set."""
+
+    size: int
+    """The size parameter is the number of data points to generate."""
+
+
+    def __init__(self, size: int = 200, seed: Optional[int] = None) -> None:
+        """Initialises the dataset object with passed parameters.
+        
+        Parameters
+        ----------
+        size : int, optional
+            The number of data points to generate. The default is 200.
+        
+        Other Parameters
+        ----------------
+        seed : int, optional
+            Seed parameter to make data generation deterministic."""
+        self.seed = seed
+        self.size = size
+
+    def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
+        """Generates a random dataset of uniformly uniform distribution between 0 and 1."""
+        if self.seed:
+            np.random.seed(self.seed)
+        xs = np.reshape(np.linspace(0, 2 *np.pi, self.size), (self.size, 1))
+        ys = np.random.uniform(0, 1, (self.size, 1))
+        np.random.seed() # rerandomise seed
         return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
-
-    def show(self) -> None:
-        x_min, x_max = self.X.min() - 0.5, self.X.max() + 0.5
-        y_min, y_max = self.y.min() - 0.5, self.y.max() + 0.5
-
-        # just plot the dataset first
-
-        # Plot the training points
-        plt.scatter(self.X[:, 0], self.y[:, 0], edgecolors="k")
-
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
+        """Returns a train test split of the data."""
+        X, y = self.generate_data()
+        return train_test_split(X, y, test_size=test_size, random_state=42)
 
 
 class Sine(Dataset):
-    def __init__(self, noise: float = 0.5, size: int = 200) -> None:
-        self.X, self.y = self.generate_data(noise=noise, size=size)
+    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math: `2 \pi`, 
+    and `y` is the corresponding sine wave with gaussian noise added. Both `X` and `y` are 2D arrays of shape `(size, 1)`."""
 
-    def generate_data(
-        self, noise: float = 0.5, size: int = 200
-    ) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        xs = np.reshape(np.linspace(0, np.pi, size), (size, 1))
+    noise: float
+    """The noise parameter is the standard deviation of the gaussian noise added to the sine wave."""
+
+    size: int
+    """The size parameter is the number of data points to generate."""
+
+    def __init__(self, size: int = 200, noise: float = 0.5) -> None:
+        r"""Initialises the dataset object with passed paramters.
+
+        Parameters
+        ----------
+        size : int, optional
+            The number of data points to generate. The default is 200.
+        noise : float, optional
+            The magintude of noise to add to the sine wave. The default is 0.5.
+
+        """
+        self.noise = noise
+        self.size = size
+
+    def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
+        """Generates a sine wave with gaussian noise added."""
+        xs = np.reshape(np.linspace(0, 2* np.pi, self.size), (self.size, 1))
         ys = np.sin(xs[:, 0])
-        ys += noise * 0.1 * np.random.normal(-1, 1, (size))
-        return xs, np.reshape(ys, (size,))
+        ys += np.random.normal(0.0, self.noise, (self.size))
+        return xs, np.reshape(ys, (self.size,1))
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
-        return train_test_split(self.X, self.y, test_size=test_size, random_state=42)
-
-    def show(self) -> None:
-        x_min, x_max = self.X.min() - 0.5, self.X.max() + 0.5
-        y_min, y_max = self.y.min() - 0.5, self.y.max() + 0.5
-
-        # just plot the dataset first
-
-        # Plot the training points
-        plt.scatter(self.X[:, 0], self.y[:, 0], edgecolors="k")
-
-        plt.xlim(x_min, x_max)
-        plt.ylim(y_min, y_max)
-        plt.xticks(())
-        plt.yticks(())
-        plt.show()
+        """Returns a train test split of the data."""
+        X, y = self.generate_data()
+        return train_test_split(X, y, test_size=test_size, random_state=42)
+    
