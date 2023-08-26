@@ -135,7 +135,7 @@ class Complex_Fourrier(Dataset):
     .. math:: f(x) = \sum_{r=0}^{N} a_r \sin(r x) + b_r \cos(r x)
 
     Where :math:`\mathbf{a}` and :math:`\mathbf{b}` are vectors of uniformly distributed random coefficients between -1 and 1 and
-    :math:`N` is `complexity`..
+    :math:`N` is `complexity`.
     """
 
     noise: float
@@ -184,7 +184,9 @@ class Complex_Fourrier(Dataset):
 
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        """Generates a truncated random fourrier series."""
+        """
+        @private
+        Generates a truncated random fourrier series."""
         if self.seed:
             np.random.seed(self.seed)
         self.random_coef = np.random.uniform(-1, 1, (self.complexity, 2))
@@ -250,7 +252,9 @@ class MackeyGlass(Dataset):
         self.tau = tau
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        """Generates a MackeyGlass time series."""
+        """
+        @private
+        Generates a MackeyGlass time series."""
         start_val_num = 1 + self.tau
         y = list(np.random.uniform(0.95, 1.05, start_val_num))
         for n in range(start_val_num - 1, self.size + 99):
@@ -301,7 +305,9 @@ class Random(Dataset):
         self.size = size
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        """Generates a random dataset of uniformly uniform distribution between 0 and 1."""
+        """
+        @private
+        Generates a random dataset of uniformly uniform distribution between 0 and 1."""
         if self.seed:
             np.random.seed(self.seed)
         xs = np.reshape(np.linspace(0, 2 *np.pi, self.size), (self.size, 1))
@@ -344,7 +350,9 @@ class Sine(Dataset):
         self.size = size
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
-        """Generates a sine wave with gaussian noise added."""
+        """
+        @private
+        Generates a sine wave with gaussian noise added."""
         xs = np.reshape(np.linspace(0, 2* np.pi, self.size), (self.size, 1))
         ys = np.sin(xs[:, 0])
         ys += np.random.normal(0.0, self.noise, (self.size))
