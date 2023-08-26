@@ -2,8 +2,8 @@ import pytest
 import numpy as np
 from qulacs import DensityMatrix, QuantumState
 from qulacs.state import partial_trace
-from qreservoir.reservoirs.IsingMagTraverseReservoir import IsingMagTraverseReservoir
-from qreservoir.encoders.HEEncoder import HEEncoder
+from qreservoir.reservoirs import IsingMagTraverseReservoir
+from qreservoir.encoders import HEEncoder
 
 
 def test_no_encoder_raises_error() -> None:

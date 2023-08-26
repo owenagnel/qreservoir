@@ -1,7 +1,7 @@
-from qreservoir.models.QELModel import QELModel
-from qreservoir.reservoirs.HarrRandomReservoir import HarrRandomReservoir
-from qreservoir.reservoirs.CNOTReservoir import CNOTReservoir
-from qreservoir.encoders.HEEncoder import HEEncoder
+from qreservoir.models import QELModel
+from qreservoir.reservoirs import HarrRandomReservoir
+from qreservoir.reservoirs import CNOTReservoir
+from qreservoir.encoders import HEEncoder
 from qulacs import Observable, QuantumState
 from sklearn.linear_model import LinearRegression
 import numpy as np
