@@ -1,23 +1,9 @@
-from abc import abstractmethod, ABC
 from typing import Tuple, Optional
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_circles, make_classification, make_moons
-
-
-TrainTestSplit = Tuple[
-    NDArray[np.double], NDArray[np.double], NDArray[np.double], NDArray[np.double]
-]
-"""
-@private
-Type alias for a train test split."""
-
-
-class Dataset(ABC):
-    @abstractmethod
-    def get_train_test(self, test_size: float) -> TrainTestSplit:
-        ...
+from qreservoir.abstract_base_classes import Dataset, TrainTestSplit
 
 
 class Circles(Dataset):
@@ -55,11 +41,11 @@ class Circles(Dataset):
 
 
 class LinearlySeperable(Dataset):
-    """A linearly seperable classification dataset. `X` is an array of shape `(size, 2)` 
-    and `y` is an array of shape `(size,)` containing labels. Returns the scikit-learn 
+    """A linearly seperable classification dataset. `X` is an array of shape `(size, 2)`
+    and `y` is an array of shape `(size,)` containing labels. Returns the scikit-learn
     make_classification dataset with the passed parameters. Noise is added to the dataset via
     a multivariqte gaussian."""
-    
+
     noise: float
     """
     @private
@@ -85,7 +71,7 @@ class LinearlySeperable(Dataset):
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         """Returns a train test split of the data."""
-        X,y = make_classification(
+        X, y = make_classification(
             n_features=2,
             n_redundant=0,
             n_informative=2,
@@ -96,8 +82,9 @@ class LinearlySeperable(Dataset):
         X += 4 * self.noise * rng.uniform(size=X.shape)
         return train_test_split(X, y, test_size=test_size)
 
+
 class Moons(Dataset):
-    """A moons classification dataset. `X` is an array of shape `(size, 2)` 
+    """A moons classification dataset. `X` is an array of shape `(size, 2)`
     and `y` is an array of shape `(size,)` containing labels.
     Returns the scikit-learn make_moons dataset with the passed parameters."""
 
@@ -127,11 +114,12 @@ class Moons(Dataset):
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         X, y = make_moons(noise=self.noise, n_samples=self.size)
         return train_test_split(X, y, test_size=test_size)
-    
+
+
 class Complex_Fourrier(Dataset):
     r"""A truncated random fourrier series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
     `X` is a linspace between 0 and :math:`2 \pi`, and `y` is :math:`f(x)` for a given :math:`x`.
-    
+
     .. math:: f(x) = \sum_{r=0}^{N} a_r \sin(r x) + b_r \cos(r x)
 
     Where :math:`\mathbf{a}` and :math:`\mathbf{b}` are vectors of uniformly distributed random coefficients between -1 and 1 and
@@ -159,7 +147,11 @@ class Complex_Fourrier(Dataset):
     The seed parameter makes data generation deterministic. If None, the seed is not set."""
 
     def __init__(
-        self, noise: float = 0.5, size: int = 200, complexity: int = 5, seed: Optional[int] = None
+        self,
+        noise: float = 0.5,
+        size: int = 200,
+        complexity: int = 5,
+        seed: Optional[int] = None,
     ) -> None:
         r"""Initialises the dataset object with passed parameters.
 
@@ -182,7 +174,6 @@ class Complex_Fourrier(Dataset):
         self.complexity = complexity
         self.seed = seed
 
-
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         """
         @private
@@ -196,7 +187,7 @@ class Complex_Fourrier(Dataset):
             ys = np.add(self.random_coef[i][0] * np.sin(i * xs[:, 0]), ys)
             ys = np.add(self.random_coef[i][1] * np.cos(i * xs[:, 0]), ys)
         ys += np.random.normal(0, self.noise, (self.size))
-        np.random.seed() # rerandomise seed
+        np.random.seed()  # rerandomise seed
         return xs, np.reshape(ys, (self.size, 1))
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
@@ -206,8 +197,9 @@ class Complex_Fourrier(Dataset):
 
 
 class MackeyGlass(Dataset):
-    """A MackeyGlass time series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`. 
-    `X` is a linspace between 0 and 10, and `y` is the corresponding MackeyGlass value at that time step"""
+    """A MackeyGlass time series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
+    `X` is a linspace between 0 and 10, and `y` is the corresponding MackeyGlass value at that time step
+    """
 
     size: int
     """
@@ -229,7 +221,9 @@ class MackeyGlass(Dataset):
     @private
     The tau parameter is a constant in the MackeyGlass equation. Depth of history."""
 
-    def __init__(self, size: int = 200, b: float = 0.05, c: float = 0.15, tau: int = 20) -> None:
+    def __init__(
+        self, size: int = 200, b: float = 0.05, c: float = 0.15, tau: int = 20
+    ) -> None:
         r"""Initialises the dataset object with passed parameters.
 
         Parameters
@@ -266,7 +260,9 @@ class MackeyGlass(Dataset):
                 )
             )
         y = y[100:]
-        return np.reshape(np.linspace(0, 10, self.size), (self.size, 1)), np.reshape(np.array(y), (self.size, 1))
+        return np.reshape(np.linspace(0, 10, self.size), (self.size, 1)), np.reshape(
+            np.array(y), (self.size, 1)
+        )
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         """Returns a train test split of the data."""
@@ -275,8 +271,9 @@ class MackeyGlass(Dataset):
 
 
 class Random(Dataset):
-    """A random regression dataset of uniformly uniform distribution between 0 and 1. Both `X` and `y` are 
-    2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math:`2 \pi`, and `y` is a random uniform."""
+    """A random regression dataset of uniformly uniform distribution between 0 and 1. Both `X` and `y` are
+    2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math:`2 \pi`, and `y` is a random uniform.
+    """
 
     seed: Optional[int]
     """
@@ -288,15 +285,14 @@ class Random(Dataset):
     @private
     The size parameter is the number of data points to generate."""
 
-
     def __init__(self, size: int = 200, seed: Optional[int] = None) -> None:
         """Initialises the dataset object with passed parameters.
-        
+
         Parameters
         ----------
         size : int, optional
             The number of data points to generate. The default is 200.
-        
+
         Other Parameters
         ----------------
         seed : int, optional
@@ -310,9 +306,9 @@ class Random(Dataset):
         Generates a random dataset of uniformly uniform distribution between 0 and 1."""
         if self.seed:
             np.random.seed(self.seed)
-        xs = np.reshape(np.linspace(0, 2 *np.pi, self.size), (self.size, 1))
+        xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.random.uniform(0, 1, (self.size, 1))
-        np.random.seed() # rerandomise seed
+        np.random.seed()  # rerandomise seed
         return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
@@ -322,8 +318,9 @@ class Random(Dataset):
 
 
 class Sine(Dataset):
-    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math:`2 \pi`, 
-    and `y` is the corresponding sine wave with gaussian noise added. Both `X` and `y` are 2D arrays of shape `(size, 1)`."""
+    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math:`2 \pi`,
+    and `y` is the corresponding sine wave with gaussian noise added. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
+    """
 
     noise: float
     """
@@ -353,13 +350,12 @@ class Sine(Dataset):
         """
         @private
         Generates a sine wave with gaussian noise added."""
-        xs = np.reshape(np.linspace(0, 2* np.pi, self.size), (self.size, 1))
+        xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.sin(xs[:, 0])
         ys += np.random.normal(0.0, self.noise, (self.size))
-        return xs, np.reshape(ys, (self.size,1))
+        return xs, np.reshape(ys, (self.size, 1))
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         """Returns a train test split of the data."""
         X, y = self.generate_data()
         return train_test_split(X, y, test_size=test_size, random_state=42)
-    

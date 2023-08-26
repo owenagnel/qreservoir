@@ -1,4 +1,3 @@
-from abc import abstractmethod, ABC
 from functools import reduce
 from typing import Union, cast, Optional, List, Tuple
 import numpy as np
@@ -12,46 +11,51 @@ from qulacs import (
 from qulacs.state import tensor_product
 from qulacs.gate import RotX, RotY, RotZ, CZ, CNOT, RandomUnitary, X, Z, DenseMatrix
 from qulacsvis import circuit_drawer
-from qreservoir.encoders import Encoder
-
-
-class Reservoir(ABC):
-    @abstractmethod
-    def get_dynamics_circuit(self) -> QuantumCircuit:
-        ...
-
-    @abstractmethod
-    def get_ancilla_num(self) -> int:
-        ...
-
-    @abstractmethod
-    def get_encoding_qubit_num(self) -> int:
-        ...
-
-    @abstractmethod
-    def get_reservoir_state(
-        self,
-        input_vect: NDArray[np.double],
-        prev: Union[QuantumState, DensityMatrix, None],
-    ) -> Union[QuantumState, DensityMatrix]:
-        ...
-
-    @abstractmethod
-    def __len__(self) -> int:
-        ...
-
-    @abstractmethod
-    def connect_encoder(self, encoder: Encoder) -> None:
-        ...
-
-    @abstractmethod
-    def print_circuit(self) -> None:
-        ...
+from qreservoir.abstract_base_classes import Reservoir, Encoder
 
 
 class CNOTReservoir(Reservoir):
-    """The CNOTReservoir class simulates a reservoir of dynamics.
-    The reservoir is made up of CNOT gates in a cyclic entangling structure"""
+    r"""The CNOT class simulates a reservoir with CNOT dynamics.
+    The reservoir is made up of CNOT gates in a cyclic
+    entangling structure.
+
+    The reservoir structure is:
+    .. math:: \prod_{l=1}^d W
+
+    with
+
+    .. math:: W = \text{C-Phase}_{N,1} \times \prod_{i=1}^{n-1} \text{C-Phase}_{i,i+1}
+    """
+
+    encoder: Optional[Encoder]
+    """
+    @private
+    The encoder used to encode the input data into a quantum state"""
+
+    enc_qubit_num: int
+    """
+    @private
+    The number of qubits used to encode the input data"""
+
+    ancilla_num: int
+    """
+    @private
+    The number of ancilla qubits"""
+
+    total_size: int
+    """
+    @private
+    The total number of qubits in the reservoir"""
+
+    depth: int
+    """
+    @private
+    The depth of the reservoir"""
+
+    dynamics_circuit: QuantumCircuit
+    """
+    @private
+    The circuit representing the reservoir dynamics"""
 
     def __init__(
         self,
@@ -60,9 +64,27 @@ class CNOTReservoir(Reservoir):
         depth: int,
         enc_qubit_num: int = 5,
     ) -> None:
-        """Initialises the reservoir with the correct number of qubits
+        r"""Initialises the reservoir with the correct number of qubits
         given an encoder and ancilla qubit number. If no encoder is provided,
-        enc_qubit_num is used to initialise the reservoir.
+        `enc_qubit_num` is used to initialise the reservoir.
+
+        Parameters
+        ----------
+        encoder : Encoder, optional
+            An encoder object to be used in tandem with the reservoir.
+        ancilla_num : int
+            The number of qubits in the hidden space of our reservoir.
+            These qubits qre unaffected by the input data before the reservoir
+            dynamics take place. In a reservoir model they are what allows for the memory property.
+        depth : int
+            Depth of the reservoir.
+
+        Other Parameters
+        ----------------
+        enc_qubit_num : int, optional
+            Infrequently used paramter to manually specify encoding qubit number.
+            Allows us to initialise the reservoir without an encoder. If an encoder is provided, this
+            argument is ignored.
         """
 
         self.encoder = encoder
@@ -148,8 +170,34 @@ class CNOTReservoir(Reservoir):
 
 
 class HarrRandomReservoir(Reservoir):
-    """The HarrRandomReservoir class simulates a reservoir with random dynamics.
-    The reservoir is essentially a harr random unitary matrix"""
+    r"""The HarrRandomReservoir class simulates a reservoir with a random unitary as dynamics.
+    The reservoir is made up of a single unitary sampled from the haar measure.
+    """
+
+    encoder: Optional[Encoder]
+    """
+    @private
+    The encoder used to encode the input data into a quantum state"""
+
+    enc_qubit_num: int
+    """
+    @private
+    The number of qubits used to encode the input data"""
+
+    ancilla_num: int
+    """
+    @private
+    The number of ancilla qubits"""
+
+    total_size: int
+    """
+    @private
+    The total number of qubits in the reservoir"""
+
+    dynamics_circuit: QuantumCircuit
+    """
+    @private
+    The circuit representing the reservoir dynamics"""
 
     def __init__(
         self,
@@ -157,9 +205,23 @@ class HarrRandomReservoir(Reservoir):
         ancilla_num: int,
         enc_qubit_num: int = 5,
     ) -> None:
-        """Initialises the reservoir with the correct number of qubits
+        r"""Initialises the reservoir with the correct number of qubits
         given an encoder and ancilla qubit number. If no encoder is provided,
-        enc_qubit_num is used to initialise the reservoir.
+        `enc_qubit_num` is used to initialise the reservoir.
+
+        Parameters
+        ----------
+        encoder : Encoder, optional
+            An encoder object to be used in tandem with the reservoir.
+        ancilla_num : int
+            The number of qubits in the hidden space of our reservoir.
+
+        Other Parameters
+        ----------------
+        enc_qubit_num : int, optional
+            Infrequently used paramter to manually specify encoding qubit number.
+            Allows us to initialise the reservoir without an encoder. If an encoder is provided, this
+            argument is ignored.
         """
 
         self.encoder = encoder
@@ -183,9 +245,9 @@ class HarrRandomReservoir(Reservoir):
         input_vect: NDArray[np.double],
         prev: Union[QuantumState, DensityMatrix, None] = None,
     ) -> Union[QuantumState, DensityMatrix]:
-        """Returns the final state of the reservoir after encoding the input
+        """Returns the final state of the reservoir after encoding `input_vect`
         and applying the dynamics; if prev is passed, ouput will match the
-        type of prev (i.e. QuantumState or DensityMatrix)"""
+        type of `prev` (i.e. QuantumState or DensityMatrix)"""
 
         if self.encoder is None:
             raise ValueError("Encoder must be connected before getting reservoir state")
@@ -242,8 +304,64 @@ class HarrRandomReservoir(Reservoir):
 
 
 class IsingMagTraverseReservoir(Reservoir):
-    """The CNOTReservoir class simulates a reservoir of dynamics.
-    The reservoir is made up of CNOT gates in a cyclic entangling structure"""
+    r"""The IsingMagTraverseReservoir class simulates a reservoir with Ising Hamiltonian dynamics.
+    The reservoir is made up of a single ising hamiltonian with random coefficients.
+
+    The reservoir structure is:
+    .. math:: U_{\text{Ising}} = \exp(-i H t)
+
+    where
+
+    .. math:: H = \sum_{j=1}^N a_j X_j + \sum_{j=1}^N \sum_{k=1}^{j-1} J_{jk} Z_j Z_k
+
+
+    Where coefficients :math:`J` and :math:`a` are randomly sampled from the uniform distribution.
+    """
+
+    encoder: Optional[Encoder]
+    """
+    @private
+    The encoder used to encode the input data into a quantum state"""
+
+    enc_qubit_num: int
+    """
+    @private
+    The number of qubits used to encode the input data"""
+
+    ancilla_num: int
+    """
+    @private
+    The number of ancilla qubits"""
+
+    total_size: int
+    """
+    @private
+    The total number of qubits in the reservoir"""
+
+    time_step: float
+    """
+    @private
+    The time step of the ising hamiltonian dynamics"""
+
+    I_mat: NDArray[np.double]
+    """
+    @private
+    The identity matrix (helper)"""
+
+    X_mat: NDArray[np.double]
+    """
+    @private
+    The Pauli-X matrix (helper)"""
+
+    Z_mat: NDArray[np.double]
+    """
+    @private
+    The Pauli-Z matrix (helper)"""
+
+    dynamics_circuit: QuantumCircuit
+    """
+    @private
+    The circuit representing the reservoir dynamics"""
 
     def __init__(
         self,
@@ -252,9 +370,27 @@ class IsingMagTraverseReservoir(Reservoir):
         enc_qubit_num: int = 5,
         time_step: float = 0.5,
     ) -> None:
-        """Initialises the reservoir with the correct number of qubits
+        r"""Initialises the reservoir with the correct number of qubits
         given an encoder and ancilla qubit number. If no encoder is provided,
-        enc_qubit_num is used to initialise the reservoir.
+        `enc_qubit_num` is used to initialise the reservoir.
+
+        Parameters
+        ----------
+        encoder : Encoder, optional
+            An encoder object to be used in tandem with the reservoir.
+        ancilla_num : int
+            The number of qubits in the hidden space of our reservoir.
+            These qubits qre unaffected by the input data before the reservoir
+            dynamics take place. In a reservoir model they are what allows for the memory property.
+        time_step : float, optional
+            Time step of the ising hamiltonian dynamics.
+
+        Other Parameters
+        ----------------
+        enc_qubit_num : int, optional
+            Infrequently used paramter to manually specify encoding qubit number.
+            Allows us to initialise the reservoir without an encoder. If an encoder is provided, this
+            argument is ignored.
         """
 
         self.encoder = encoder
@@ -280,6 +416,7 @@ class IsingMagTraverseReservoir(Reservoir):
         return circuit
 
     def get_ising_hamiltonian(self) -> QuantumGateBase:
+        """Constructs a random ising hamiltonian gate"""
         ham = np.zeros((2**self.total_size, 2**self.total_size), dtype=complex)
         for i in range(self.total_size):  ## i runs 0 to nqubit-1
             Jx = -1.0 + 2.0 * np.random.rand()  ## random number in -1~1
@@ -299,8 +436,8 @@ class IsingMagTraverseReservoir(Reservoir):
     def make_fullgate(
         self, list_SiteAndOperator: List[Tuple[int, np.ndarray]]
     ) -> NDArray[np.double]:
-        """Take list_SiteAndOperator = [ [i_0, O_0], [i_1, O_1], ...],
-        Insert Identity into unrelated qubit
+        """Take `list_SiteAndOperator` = [ [i_0, O_0], [i_1, O_1], ...],
+        Insert I into unrelated qubit
         make (2**nqubit, 2**nqubit) matrix:
         I(0) * ... * O_0(i_0) * ... * O_1(i_1) ..."""
 
@@ -321,9 +458,9 @@ class IsingMagTraverseReservoir(Reservoir):
         input_vect: NDArray[np.double],
         prev: Union[QuantumState, DensityMatrix, None] = None,
     ) -> Union[QuantumState, DensityMatrix]:
-        """Returns the final state of the reservoir after encoding the input
-        and applying the dynamics; if prev is passed, ouput will match the
-        type of prev (i.e. QuantumState or DensityMatrix)"""
+        """Returns the final state of the reservoir after encoding `input_vect`
+        and applying the dynamics; if `prev` is passed, ouput will match the
+        type of `prev` (i.e. `QuantumState` or `DensityMatrix`)"""
 
         if self.encoder is None:
             raise ValueError("Encoder must be connected before getting reservoir state")
@@ -399,6 +536,41 @@ class RotationReservoir(Reservoir):
     about the :math:`k_i^l = x, y` or :math:`z` axis.
     """
 
+    encoder: Optional[Encoder]
+    """
+    @private
+    The encoder used to encode the input data into a quantum state"""
+
+    enc_qubit_num: int
+    """
+    @private
+    The number of qubits used to encode the input data"""
+
+    ancilla_num: int
+    """
+    @private
+    The number of ancilla qubits"""
+
+    total_size: int
+    """
+    @private
+    The total number of qubits in the reservoir"""
+
+    depth: int
+    """
+    @private
+    The depth of the reservoir"""
+
+    gates: List[str]
+    """
+    @private
+    The gate set used in the reservoir dynamics"""
+
+    dynamics_circuit: QuantumCircuit
+    """
+    @private
+    The circuit representing the reservoir dynamics"""
+
     def __init__(
         self,
         encoder: Optional[Encoder],
@@ -469,8 +641,8 @@ class RotationReservoir(Reservoir):
         input_vect: NDArray[np.double],
         prev: Union[QuantumState, DensityMatrix, None] = None,
     ) -> Union[QuantumState, DensityMatrix]:
-        """Returns the final state of the reservoir after encoding the input
-        and applying the dynamics; if prev is passed, ouput will match the
+        """Returns the final state of the reservoir after encoding the `input_vect`
+        and applying the dynamics; if `prev` is passed, ouput will match the
         type of prev (i.e. QuantumState or DensityMatrix)"""
 
         if self.encoder is None:
@@ -515,7 +687,7 @@ class RotationReservoir(Reservoir):
         return self.total_size
 
     def print_circuit(self) -> None:
-        """Prints the circuit diagram of the reservoir"""
+        """Prints the circuit diagram of the reservoir to terminal."""
         circuit_drawer(self.dynamics_circuit)
 
     def get_ancilla_num(self) -> int:

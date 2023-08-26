@@ -1,31 +1,9 @@
-from abc import abstractmethod, ABC
 import numpy as np
 from numpy.typing import NDArray
 from qulacs import QuantumCircuit, QuantumState, QuantumGateBase
 from qulacs.gate import CZ, RotX, RotY, RotZ
 from qulacsvis import circuit_drawer
-
-
-class Encoder(ABC):
-    @abstractmethod
-    def get_circuit(self, input_vect: NDArray[np.double]) -> QuantumCircuit:
-        ...
-
-    @abstractmethod
-    def get_encoding_state(self, input_vect: NDArray[np.double]) -> QuantumState:
-        ...
-
-    @abstractmethod
-    def __len__(self) -> int:
-        ...
-
-    @abstractmethod
-    def get_feature_num(self) -> int:
-        ...
-
-    @abstractmethod
-    def print_circuit(self) -> None:
-        ...
+from qreservoir.abstract_base_classes import Encoder
 
 
 class CHEEncoder(Encoder):

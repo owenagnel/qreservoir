@@ -12,7 +12,7 @@ qreservoir requires Python version 3.10 or 3.11.
 
 Modules
 =====
-There are four main subpackages in Qreservoir: `encoders`, `reservoirs`, `models` and `datasets`. Each of these 
+There are four main modules in qreservoir: `encoders`, `reservoirs`, `models` and `datasets`. Each of these 
 gives access to a variety of classes to build and train reservoir and extreme learning models.
 
 The general composition of a model is as follows:
