@@ -115,11 +115,12 @@ class Moons(Dataset):
     
 class Complex_Fourrier(Dataset):
     r"""A truncated random fourrier series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
-    `X` is a linspace between 0 and :math: `2 \pi`, and `y` is :math: `f(x)` for a given :math: `x`.
+    `X` is a linspace between 0 and :math:`2 \pi`, and `y` is :math:`f(x)` for a given :math:`x`.
     
-    .. math:: f(x) = sum_{i=0}^{\text{complexity}} a_i sin(i x) + b_i cos(i x)
+    .. math:: f(x) = \sum_{r=0}^{N} a_r \sin(r x) + b_r \cos(r x)
 
-    Where :math: `\mathbb{a}` and :math: `\mathbb{b}` are vectors of uniformly distributed random coefficients between -1 and 1.
+    Where :math:`\mathbb{a}` and :math:`\mathbb{b}` are vectors of uniformly distributed random coefficients between -1 and 1 and
+    :math:`N` is `complexity`..
     """
 
     noise: float
@@ -246,7 +247,7 @@ class MackeyGlass(Dataset):
 
 class Random(Dataset):
     """A random regression dataset of uniformly uniform distribution between 0 and 1. Both `X` and `y` are 
-    2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math: `2 \pi`, and `y` is a random uniform."""
+    2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math:`2 \pi`, and `y` is a random uniform."""
 
     seed: Optional[int]
     """The seed parameter makes data generation deterministic. If None, the seed is not set."""
@@ -286,7 +287,7 @@ class Random(Dataset):
 
 
 class Sine(Dataset):
-    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math: `2 \pi`, 
+    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math:`2 \pi`, 
     and `y` is the corresponding sine wave with gaussian noise added. Both `X` and `y` are 2D arrays of shape `(size, 1)`."""
 
     noise: float
