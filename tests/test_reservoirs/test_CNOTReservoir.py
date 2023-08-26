@@ -3,8 +3,8 @@ import numpy as np
 from typing import cast
 from qulacs import DensityMatrix, QuantumState
 from qulacs.state import partial_trace
-from qreservoir.reservoirs.CNOTReservoir import CNOTReservoir
-from qreservoir.encoders.HEEncoder import HEEncoder
+from qreservoir.reservoirs import CNOTReservoir
+from qreservoir.encoders import HEEncoder
 
 
 def test_no_encoder_raises_error() -> None:

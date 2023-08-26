@@ -1,7 +1,7 @@
-from qreservoir.models.RCModel import RCModel
-from qreservoir.reservoirs.HarrRandomReservoir import HarrRandomReservoir
-from qreservoir.reservoirs.CNOTReservoir import CNOTReservoir
-from qreservoir.encoders.HEEncoder import HEEncoder
+from qreservoir.models import RCModel
+from qreservoir.reservoirs import HarrRandomReservoir
+from qreservoir.reservoirs import CNOTReservoir
+from qreservoir.encoders import HEEncoder
 from qulacs import Observable, DensityMatrix
 from sklearn.linear_model import LinearRegression
 import numpy as np

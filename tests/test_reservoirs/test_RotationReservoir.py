@@ -2,8 +2,8 @@ import pytest
 import numpy as np
 from qulacs import DensityMatrix, QuantumState
 from qulacs.state import partial_trace
-from qreservoir.reservoirs.RotationReservoir import RotationReservoir
-from qreservoir.encoders.HEEncoder import HEEncoder
+from qreservoir.reservoirs import RotationReservoir
+from qreservoir.encoders import HEEncoder
 from typing import cast
 
 

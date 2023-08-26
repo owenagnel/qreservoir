@@ -27,12 +27,12 @@ values and translate the quantum dynamics model to a classical value.
 
 Example
 ======
-    from qreservoir.models.QELModel import QELModel
-    from qreservoir.reservoirs.RotationReservoir import RotationReservoir
-    from qreservoir.encoders.HEEncoder import HEEncoder
+    from qreservoir.models import QELModel
+    from qreservoir.reservoirs import RotationReservoir
+    from qreservoir.encoders import HEEncoder
     from qulacs import Observable
     from sklearn.linear_model import LinearRegression
-    from qreservoir.datasets.Complex_Fourrier import Complex_Fourrier
+    from qreservoir.datasets import Complex_Fourrier
 
     dataset = Complex_Fourrier()
 

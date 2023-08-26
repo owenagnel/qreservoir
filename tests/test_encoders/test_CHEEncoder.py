@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 from qulacs.state import inner_product
 from qulacs import QuantumState
-from qreservoir.encoders.CHEEncoder import CHEEncoder
+from qreservoir.encoders import CHEEncoder
 
 
 def test_zero_layer_HEE() -> None:
