@@ -38,12 +38,13 @@ Fast simulation of quantum extreme learning machine and quantum reservoir comput
 ### Python sample code
 
 ```python
-from qreservoir.models import QELModel
-from qreservoir.reservoirs import RotationReservoir
-from qreservoir.encoders import ExpEncoder
 from qulacs import Observable
 from sklearn.linear_model import LinearRegression
+
 from qreservoir.datasets import Complex_Fourrier
+from qreservoir.encoders import ExpEncoder
+from qreservoir.models import QELModel
+from qreservoir.reservoirs import RotationReservoir
 
 dataset = Complex_Fourrier(complexity=1, size=1000, noise=0.0)
 

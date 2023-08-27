@@ -1,12 +1,12 @@
-from qreservoir.models import QELModel
-from qreservoir.reservoirs import HarrRandomReservoir
-from qreservoir.reservoirs import CNOTReservoir
-from qreservoir.encoders import HEEncoder
-from qulacs import Observable, QuantumState
-from sklearn.linear_model import LinearRegression
 import numpy as np
-from sklearn.exceptions import NotFittedError
 import pytest
+from qulacs import Observable, QuantumState
+from sklearn.exceptions import NotFittedError
+from sklearn.linear_model import LinearRegression
+
+from qreservoir.encoders import HEEncoder
+from qreservoir.models import QELModel
+from qreservoir.reservoirs import CNOTReservoir, HarrRandomReservoir
 
 
 def test_QELModel_sizes_1dim() -> None:

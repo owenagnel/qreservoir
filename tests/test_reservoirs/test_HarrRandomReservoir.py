@@ -1,9 +1,9 @@
-import pytest
 import numpy as np
+import pytest
 from qulacs import DensityMatrix, QuantumState
-from qulacs.state import partial_trace
-from qreservoir.reservoirs import HarrRandomReservoir
+
 from qreservoir.encoders import HEEncoder
+from qreservoir.reservoirs import HarrRandomReservoir
 
 
 def test_no_encoder_raises_error() -> None:

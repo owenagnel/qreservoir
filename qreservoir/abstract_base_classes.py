@@ -1,9 +1,9 @@
-from abc import abstractmethod, ABC
-from typing import Union
-from numpy.typing import NDArray
+from abc import ABC, abstractmethod
+from typing import Tuple, Union
+
 import numpy as np
-from qulacs import QuantumCircuit, QuantumState, DensityMatrix
-from typing import Tuple
+from numpy.typing import NDArray
+from qulacs import DensityMatrix, QuantumCircuit, QuantumState
 
 
 class Encoder(ABC):

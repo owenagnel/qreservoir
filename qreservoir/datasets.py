@@ -1,8 +1,10 @@
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
 import numpy as np
 from numpy.typing import NDArray
-from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_circles, make_classification, make_moons
+from sklearn.model_selection import train_test_split
+
 from qreservoir.abstract_base_classes import Dataset, TrainTestSplit
 
 

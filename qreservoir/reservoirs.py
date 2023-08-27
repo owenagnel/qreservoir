@@ -1,17 +1,14 @@
 from functools import reduce
-from typing import Union, cast, Optional, List, Tuple
+from typing import List, Optional, Tuple, Union, cast
+
 import numpy as np
 from numpy.typing import NDArray
-from qulacs import (
-    QuantumCircuit,
-    QuantumState,
-    QuantumGateBase,
-    DensityMatrix,
-)
+from qulacs import DensityMatrix, QuantumCircuit, QuantumGateBase, QuantumState
+from qulacs.gate import CNOT, CZ, DenseMatrix, RandomUnitary, RotX, RotY, RotZ, X, Z
 from qulacs.state import tensor_product
-from qulacs.gate import RotX, RotY, RotZ, CZ, CNOT, RandomUnitary, X, Z, DenseMatrix
 from qulacsvis import circuit_drawer
-from qreservoir.abstract_base_classes import Reservoir, Encoder
+
+from qreservoir.abstract_base_classes import Encoder, Reservoir
 
 
 class CNOTReservoir(Reservoir):
@@ -121,10 +118,10 @@ class CNOTReservoir(Reservoir):
             if prev.get_qubit_count() != self.ancilla_num:
                 raise ValueError("prev must have the correct number of ancilla qubits")
 
-            if type(prev) == QuantumState:
+            if isinstance(prev, QuantumState):
                 full_state = tensor_product(prev, encoding_state)
 
-            elif type(prev) == DensityMatrix:
+            elif isinstance(prev, DensityMatrix):
                 # Cast encoding state as a density matrix
                 encoding_state_as_density_matrix = DensityMatrix(self.enc_qubit_num)
                 encoding_state_as_density_matrix.load(encoding_state)
@@ -255,10 +252,10 @@ class HarrRandomReservoir(Reservoir):
             if prev.get_qubit_count() != self.ancilla_num:
                 raise ValueError("prev must have the correct number of ancilla qubits")
 
-            if type(prev) == QuantumState:
+            if isinstance(prev, QuantumState):
                 full_state = tensor_product(prev, encoding_state)
 
-            elif type(prev) == DensityMatrix:
+            elif isinstance(prev, DensityMatrix):
                 # Cast encoding state as a density matrix
                 encoding_state_as_density_matrix = DensityMatrix(self.enc_qubit_num)
                 encoding_state_as_density_matrix.load(encoding_state)
@@ -414,8 +411,8 @@ class IsingMagTraverseReservoir(Reservoir):
     def get_ising_hamiltonian(self) -> QuantumGateBase:
         """Constructs a random ising hamiltonian gate"""
         ham = np.zeros((2**self.total_size, 2**self.total_size), dtype=complex)
-        for i in range(self.total_size):  ## i runs 0 to nqubit-1
-            Jx = -1.0 + 2.0 * np.random.rand()  ## random number in -1~1
+        for i in range(self.total_size):  # i runs 0 to nqubit-1
+            Jx = -1.0 + 2.0 * np.random.rand()  # random number in -1~1
             ham += Jx * self.make_fullgate([(i, self.X_mat)])
             for j in range(i + 1, self.total_size):
                 J_ij = -1.0 + 2.0 * np.random.rand()
@@ -438,13 +435,13 @@ class IsingMagTraverseReservoir(Reservoir):
         I(0) * ... * O_0(i_0) * ... * O_1(i_1) ..."""
 
         list_Site = [SiteAndOperator[0] for SiteAndOperator in list_SiteAndOperator]
-        list_SingleGates = []  ## Arrange 1-qubit gates and reduce with np.kron
+        list_SingleGates = []  # Arrange 1-qubit gates and reduce with np.kron
         cnt = 0
         for i in range(self.total_size):
             if i in list_Site:
                 list_SingleGates.append(list_SiteAndOperator[cnt][1])
                 cnt += 1
-            else:  ## an empty site is identity
+            else:  # an empty site is identity
                 list_SingleGates.append(self.I_mat)
 
         return reduce(np.kron, list_SingleGates)
@@ -468,10 +465,10 @@ class IsingMagTraverseReservoir(Reservoir):
             if prev.get_qubit_count() != self.ancilla_num:
                 raise ValueError("prev must have the correct number of ancilla qubits")
 
-            if type(prev) == QuantumState:
+            if isinstance(prev, QuantumState):
                 full_state = tensor_product(prev, encoding_state)
 
-            elif type(prev) == DensityMatrix:
+            elif isinstance(prev, DensityMatrix):
                 # Cast encoding state as a density matrix
                 encoding_state_as_density_matrix = DensityMatrix(self.enc_qubit_num)
                 encoding_state_as_density_matrix.load(encoding_state)
@@ -651,10 +648,10 @@ class RotationReservoir(Reservoir):
             if prev.get_qubit_count() != self.ancilla_num:
                 raise ValueError("prev must have the correct number of ancilla qubits")
 
-            if type(prev) == QuantumState:
+            if isinstance(prev, QuantumState):
                 full_state = tensor_product(prev, encoding_state)
 
-            elif type(prev) == DensityMatrix:
+            elif isinstance(prev, DensityMatrix):
                 # Cast encoding state as a density matrix
                 encoding_state_as_density_matrix = DensityMatrix(self.enc_qubit_num)
                 encoding_state_as_density_matrix.load(encoding_state)

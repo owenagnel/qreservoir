@@ -1,7 +1,8 @@
-import pytest
 import numpy as np
-from qulacs.state import inner_product
+import pytest
 from qulacs import QuantumState
+from qulacs.state import inner_product
+
 from qreservoir.encoders import HEEncoder
 
 

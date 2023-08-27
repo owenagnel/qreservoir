@@ -1,8 +1,9 @@
 import numpy as np
 from numpy.typing import NDArray
-from qulacs import QuantumCircuit, QuantumState, QuantumGateBase
+from qulacs import QuantumCircuit, QuantumGateBase, QuantumState
 from qulacs.gate import CZ, RotX, RotY, RotZ
 from qulacsvis import circuit_drawer
+
 from qreservoir.abstract_base_classes import Encoder
 
 

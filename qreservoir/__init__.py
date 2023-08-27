@@ -1,6 +1,6 @@
 """
 
-Qreserveoir is a Python package for quantum reservoir engineering and quantum extreme learning built on top of qulacs. 
+Qreserveoir is a Python package for quantum reservoir engineering and quantum extreme learning built on top of qulacs.
 
 Installation
 =====
@@ -12,7 +12,7 @@ The easiest way to install `qreservoir` is using pip:
 
 Modules
 =====
-There are four main modules in `qreservoir`: `encoders`, `reservoirs`, `models` and `datasets`. Each of these 
+There are four main modules in `qreservoir`: `encoders`, `reservoirs`, `models` and `datasets`. Each of these
 gives access to a variety of classes to build and train reservoir and extreme learning models.
 
 The general composition of a model is as follows:
@@ -21,18 +21,19 @@ The general composition of a model is as follows:
 2. A *reservoir*, which evolves the quantum state to which we pass an encoder
 3. A *model*, which is a wrapper around reservoirs allowing for prediction and training
 
-Models take a scikit-learn estimator as an argument, which is used to train the model and make predictions. 
-The model also takes a list of qulacs observables as an argument, which are used to calculate the expectation 
+Models take a scikit-learn estimator as an argument, which is used to train the model and make predictions.
+The model also takes a list of qulacs observables as an argument, which are used to calculate the expectation
 values and translate the quantum dynamics model to a classical value.
 
 Example
 ======
-    from qreservoir.models import QELModel
-    from qreservoir.reservoirs import RotationReservoir
-    from qreservoir.encoders import ExpEncoder
     from qulacs import Observable
     from sklearn.linear_model import LinearRegression
+
     from qreservoir.datasets import Complex_Fourrier
+    from qreservoir.encoders import ExpEncoder
+    from qreservoir.models import QELModel
+    from qreservoir.reservoirs import RotationReservoir
 
 
     dataset = Complex_Fourrier(complexity=1, size=1000, noise=0.0)

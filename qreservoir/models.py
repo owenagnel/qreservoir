@@ -1,12 +1,13 @@
-from typing import List, Optional, Tuple, cast, Union
+from typing import List, Optional, Tuple, cast
+
 import numpy as np
 from numpy.typing import NDArray
-from sklearn.base import BaseEstimator
-from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 from qulacs import DensityMatrix, Observable, QuantumState
 from qulacs.state import partial_trace
+from sklearn.base import BaseEstimator
+from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
+
 from qreservoir.reservoirs import Reservoir
-from enum import Enum
 
 OBSERVABLE_SETS = ["Total-Z", "IC-POVM"]
 
