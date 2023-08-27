@@ -20,11 +20,7 @@ class CNOTReservoir(Reservoir):
     entangling structure.
 
     The reservoir structure is:
-    .. math:: \prod_{l=1}^d W
-
-    with
-
-    .. math:: W = \text{C-Phase}_{N,1} \times \prod_{i=1}^{n-1} \text{C-Phase}_{i,i+1}
+    .. math:: \prod_{l=1}^d \text{C-Phase}_{N,1} \prod_{i=1}^{n-1} \text{C-Phase}_{i,i+1}
     """
 
     encoder: Optional[Encoder]

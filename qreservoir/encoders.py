@@ -258,7 +258,7 @@ class NoisyHEEncoder(Encoder):
 
 class NonCorrelatedCHEE(Encoder):
     """Non correlated case of CHE Encoder class. Each layer encodes a different set of features. Hence get_encoding_state() takes an input of shape (`depth`, `feature_num`).
-    Probably should be deprecated ASAP. just a test
+    .. deprecated
     """
 
     def __init__(
