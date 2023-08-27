@@ -117,7 +117,7 @@ class Moons(Dataset):
 
 
 class Complex_Fourrier(Dataset):
-    r"""A truncated random fourrier series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
+    r"""A truncated random fourrier series regression dataset. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     `X` is a linspace between 0 and :math:`2 \pi`, and `y` is :math:`f(x)` for a given :math:`x`.
 
     .. math:: f(x) = \sum_{r=0}^{N} a_r \sin(r x) + b_r \cos(r x)
@@ -184,11 +184,11 @@ class Complex_Fourrier(Dataset):
         xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.zeros(self.size)
         for i in range(self.complexity):
-            ys = np.add(self.random_coef[i][0] * np.sin(i * xs[:, 0]), ys)
-            ys = np.add(self.random_coef[i][1] * np.cos(i * xs[:, 0]), ys)
+            ys = np.add(self.random_coef[i][0] * np.sin((i + 1) * xs[:, 0]), ys)
+            ys = np.add(self.random_coef[i][1] * np.cos((i + 1) * xs[:, 0]), ys)
         ys += np.random.normal(0, self.noise, (self.size))
         np.random.seed()  # rerandomise seed
-        return xs, np.reshape(ys, (self.size, 1))
+        return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         """Returns a train test split of the data."""
@@ -197,7 +197,7 @@ class Complex_Fourrier(Dataset):
 
 
 class MackeyGlass(Dataset):
-    """A MackeyGlass time series regression dataset. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
+    """A MackeyGlass time series regression dataset. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     `X` is a linspace between 0 and 10, and `y` is the corresponding MackeyGlass value at that time step
     """
 
@@ -260,9 +260,7 @@ class MackeyGlass(Dataset):
                 )
             )
         y = y[100:]
-        return np.reshape(np.linspace(0, 10, self.size), (self.size, 1)), np.reshape(
-            np.array(y), (self.size, 1)
-        )
+        return np.reshape(np.linspace(0, 10, self.size), (self.size, 1)), np.array(y)
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         """Returns a train test split of the data."""
@@ -271,7 +269,7 @@ class MackeyGlass(Dataset):
 
 
 class Random(Dataset):
-    """A random regression dataset of uniformly uniform distribution between 0 and 1. Both `X` and `y` are
+    """A random regression dataset of uniformly uniform distribution between 0 and 1. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math:`2 \pi`, and `y` is a random uniform.
     """
 
@@ -307,7 +305,7 @@ class Random(Dataset):
         if self.seed:
             np.random.seed(self.seed)
         xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
-        ys = np.random.uniform(0, 1, (self.size, 1))
+        ys = np.random.uniform(0, 1, (self.size,))
         np.random.seed()  # rerandomise seed
         return xs, ys
 
@@ -319,7 +317,7 @@ class Random(Dataset):
 
 class Sine(Dataset):
     """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math:`2 \pi`,
-    and `y` is the corresponding sine wave with gaussian noise added. Both `X` and `y` are 2D arrays of shape `(size, 1)`.
+    and `y` is the corresponding sine wave with gaussian noise added. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     """
 
     noise: float
@@ -353,7 +351,7 @@ class Sine(Dataset):
         xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.sin(xs[:, 0])
         ys += np.random.normal(0.0, self.noise, (self.size))
-        return xs, np.reshape(ys, (self.size, 1))
+        return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
         """Returns a train test split of the data."""

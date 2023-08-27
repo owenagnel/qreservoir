@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, cast
+from typing import List, Optional, Tuple, cast, Union
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.base import BaseEstimator
@@ -6,6 +6,9 @@ from sklearn.utils.validation import check_array, check_is_fitted, check_X_y
 from qulacs import DensityMatrix, Observable, QuantumState
 from qulacs.state import partial_trace
 from qreservoir.reservoirs import Reservoir
+from enum import Enum
+
+OBSERVABLE_SETS = ["Total-Z", "IC-POVM"]
 
 
 class QELModel:
@@ -22,10 +25,30 @@ class QELModel:
         subestimator: BaseEstimator,
         initial_state: Optional[QuantumState] = None,
     ) -> None:
+        r"""Initialises the QELM model given a reservoir and estimator.
+
+        Parameters
+        ----------
+        reservoir : Reservoir
+            The reservoir, encoder pair to be used by the model.
+        observables : List[Observable]
+            A list of user defined qulacs 'Observable` objects.
+        subestimator : BaseEstimator
+            A `scikit-learn` estimator to fit the data once processed by the reservoir.
+
+        Other Parameters
+        ----------------
+        initial_state : QuantumState, optional
+            The initial state of the reservoir hidden space, by default None. Must be the same size as the reservoir ancillas.
+        """
         self.reservoir = reservoir
         self.observables = observables
         self.subestimator = subestimator
         if initial_state:
+            if initial_state.get_qubit_count() != self.reservoir.get_ancilla_num():
+                raise ValueError(
+                    "initial_state qubit count and reservoir ancilla qubit count don't match"
+                )
             self.initial_state = initial_state
         else:
             self.initial_state = QuantumState(self.reservoir.get_ancilla_num())

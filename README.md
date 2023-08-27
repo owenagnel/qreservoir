@@ -39,35 +39,39 @@ Fast simulation of quantum extreme learning machine and quantum reservoir comput
 
 ```python
 from qreservoir.models import QELModel
-from qreservoir.reservoirs import HarrRandomReservoir
-from qreservoir.encoders import HEEncoder
+from qreservoir.reservoirs import RotationReservoir
+from qreservoir.encoders import ExpEncoder
 from qulacs import Observable
 from sklearn.linear_model import LinearRegression
-import numpy as np
+from qreservoir.datasets import Complex_Fourrier
 
-# Define observable list
-observable = Observable(2)
-observable.add_operator(1.0, "Z 0")
-observables = [observable]
+dataset = Complex_Fourrier(complexity=1, size=1000, noise=0.0)
 
-# Define model
-encoder = HEEncoder(2, 2)
-reservoir = HarrRandomReservoir(encoder, 0)
-subestimator = LinearRegression()
-model = QELModel(reservoir, observables, subestimator)
+encoder = ExpEncoder(1, 1, 3) # 1 feature, 1 layer, 1 qubit per feature
+reservoir = RotationReservoir(encoder, 0, 10)  # 0 ancilla qubits, 10 depth
 
-# Training data
-X = np.zeros((10, 2))
-y = np.zeros(10)
+observables = [Observable(3) for _ in range(9)] # create observable set
+for i, ob in enumerate(observables[:3]):
+    ob.add_operator(1.0, f"X {i}")
+for i, ob in enumerate(observables[3:6]):
+    ob.add_operator(1.0, f"Z {i}")
+for i, ob in enumerate(observables[6:]):
+    ob.add_operator(1.0, f"Y {i}")
 
-# Train
+model = QELModel(reservoir, observables, LinearRegression()) # observable is a qulacs Observable object
+X, _, y, _ = dataset.get_train_test()
 model.fit(X, y)
-
-# Predict
-X_test = np.zeros((30, 2))
-out = model.predict(X_test)
+print(model.score(X, y))
 ```
 
 ## How to cite
 
 N/A
+
+## Future improvements
+
+- Model creation currently a bit clunky. Models should take encoders and reservoirs as two seperate arguments and size of inputs should be determined dynamically when fit/score are called. This is made more difficult by the fact we wish to extract variance and concentration data from the models. Ideally we want `RCModel` and `QELModel` to implement scikit-learn's `BaseEstimator` interface.
+
+- Additional tests should be written for datasets and new reservoirs/encoders
+
+- Improve package structure by using python specific object oriented features. 
