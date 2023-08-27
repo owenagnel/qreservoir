@@ -27,7 +27,7 @@ jobs:
       - run: pip install -e . pdoc
       # ADJUST THIS: build your documentation into docs/
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
-      - run: pdoc -o docs/ -d numpy --math --logo https://raw.githubusercontent.com/owenagnel/qreservoir/57cca8597b3d0d3359ad878246d7eb8e2c18cb27/docs/logo.png qreservoir
+      - run: pdoc -o docs/ -d numpy --math --logo https://raw.githubusercontent.com/owenagnel/qreservoir/main/docs/logo.png --favicon https://raw.githubusercontent.com/owenagnel/qreservoir/main/docs/favicon.png qreservoir
 
       - uses: actions/upload-pages-artifact@v2
         with:
