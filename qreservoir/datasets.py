@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -10,8 +10,8 @@ from qreservoir.abstract_base_classes import Dataset, TrainTestSplit
 
 class Circles(Dataset):
     """A circles classification dataset. `X` is an array of shape `(size, 2)`
-    and `y` is an array of shape `(size,)` containing labels. Returns the scikit-learn
-    make_circles dataset with the passed parameters."""
+    and `y` is an array of shape `(size,)` containing labels. Returns the `scikit-learn`
+    `make_circles` dataset with the passed parameters."""
 
     noise: float
     """
@@ -23,7 +23,7 @@ class Circles(Dataset):
     @private
     The size parameter is the number of data points to generate."""
 
-    def __init__(self, noise: float = 0.5, size: int = 200) -> None:
+    def __init__(self, noise: float = 0.1, size: int = 200) -> None:
         r"""Initialises the dataset object with passed parameters.
 
         Parameters
@@ -31,7 +31,7 @@ class Circles(Dataset):
         size : float, optional
             The number of data points to generate. The default is 200.
         noise : float, optional
-            The noise passed to scikit-learn make_circles. The default is 0.5.
+            The noise passed to scikit-learn make_circles. The default is 0.1 .
         """
         self.noise = noise
         self.size = size
@@ -44,9 +44,9 @@ class Circles(Dataset):
 
 class LinearlySeperable(Dataset):
     """A linearly seperable classification dataset. `X` is an array of shape `(size, 2)`
-    and `y` is an array of shape `(size,)` containing labels. Returns the scikit-learn
-    make_classification dataset with the passed parameters. Noise is added to the dataset via
-    a multivariqte gaussian."""
+    and `y` is an array of shape `(size,)` containing labels. Returns the `scikit-learn`
+    `make_classification` dataset with the passed parameters. Noise is added to the dataset via
+    a multivariate gaussian."""
 
     noise: float
     """
@@ -58,7 +58,7 @@ class LinearlySeperable(Dataset):
     @private
     The size parameter is the number of data points to generate."""
 
-    def __init__(self, noise: float = 0.5, size: int = 200) -> None:
+    def __init__(self, noise: float = 0.1, size: int = 200) -> None:
         r"""Initialises the dataset object with passed parameters.
 
         Parameters
@@ -66,7 +66,7 @@ class LinearlySeperable(Dataset):
         size : float, optional
             The number of data points to generate. The default is 200.
         noise : float, optional
-            The noise factor we multiply the gaussian noise by. The default is 0.5.
+            The noise factor we multiply the gaussian noise by. The default is 0.1 .
         """
         self.noise = noise
         self.size = size
@@ -88,19 +88,19 @@ class LinearlySeperable(Dataset):
 class Moons(Dataset):
     """A moons classification dataset. `X` is an array of shape `(size, 2)`
     and `y` is an array of shape `(size,)` containing labels.
-    Returns the scikit-learn make_moons dataset with the passed parameters."""
+    Returns the `scikit-learn` `make_moons` dataset with the passed parameters."""
 
     noise: float
     """
     @private
-    The noise parameter passed to scikit-learn make_moons."""
+    The noise parameter passed to `scikit-learn` `make_moons`."""
 
     size: int
     """
     @private
     The size parameter is the number of data points to generate."""
 
-    def __init__(self, noise: float = 0.2, size: int = 200) -> None:
+    def __init__(self, noise: float = 0.1, size: int = 200) -> None:
         r"""Initialises the dataset object with passed parameters.
 
         Parameters
@@ -108,7 +108,7 @@ class Moons(Dataset):
         size : float, optional
             The number of data points to generate. The default is 200.
         noise : float, optional
-            The noise passed to scikit-learn make_moons. The default is 0.2.
+            The noise passed to `scikit-learn` `make_moons`. The default is 0.1 .
         """
         self.noise = noise
         self.size = size
@@ -120,11 +120,11 @@ class Moons(Dataset):
 
 class Complex_Fourrier(Dataset):
     r"""A truncated random fourrier series regression dataset. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
-    `X` is a linspace between 0 and :math:`2 \pi`, and `y` is :math:`f(x)` for a given :math:`x`.
+    `X` is a linspace between :math:`0` and :math:`2 \pi`, and `y` is :math:`f(x)` for a given :math:`x`.
 
-    .. math:: f(x) = \sum_{r=0}^{N} a_r \sin(r x) + b_r \cos(r x)
+    .. math:: f(x) = \sum_{r=1}^{N} a_r \sin(r x) + b_r \cos(r x)
 
-    Where :math:`\mathbf{a}` and :math:`\mathbf{b}` are vectors of uniformly distributed random coefficients between -1 and 1 and
+    Where :math:`\mathbf{a}` and :math:`\mathbf{b}` are vectors of uniformly distributed random coefficients between :math:`-1` and :math:`1` and
     :math:`N` is `complexity`.
     """
 
@@ -143,17 +143,8 @@ class Complex_Fourrier(Dataset):
     @private
     The complexity parameter is the number of cos and sin terms in the fourrier series."""
 
-    seed: Optional[int]
-    """
-    @private
-    The seed parameter makes data generation deterministic. If None, the seed is not set."""
-
     def __init__(
-        self,
-        noise: float = 0.5,
-        size: int = 200,
-        complexity: int = 5,
-        seed: Optional[int] = None,
+        self, size: int = 200, noise: float = 0.1, complexity: int = 5
     ) -> None:
         r"""Initialises the dataset object with passed parameters.
 
@@ -162,26 +153,18 @@ class Complex_Fourrier(Dataset):
         size : float, optional
             The number of data points to generate. The default is 200.
         noise : float, optional
-            The standard deviation of noise to add to the fourrier series. The default is 0.5.
+            The standard deviation of noise to add to the fourrier series. The default is 0.1.
         complexity : int, optional
             The number of terms in the fourrier series. The default is 5.
-
-        Other Parameters
-        ----------------
-        seed : int, optional
-            Seed parameter to make data generation deterministic. The default is None.
         """
         self.noise = noise
         self.size = size
         self.complexity = complexity
-        self.seed = seed
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         """
         @private
         Generates a truncated random fourrier series."""
-        if self.seed:
-            np.random.seed(self.seed)
         self.random_coef = np.random.uniform(-1, 1, (self.complexity, 2))
         xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.zeros(self.size)
@@ -189,7 +172,6 @@ class Complex_Fourrier(Dataset):
             ys = np.add(self.random_coef[i][0] * np.sin((i + 1) * xs[:, 0]), ys)
             ys = np.add(self.random_coef[i][1] * np.cos((i + 1) * xs[:, 0]), ys)
         ys += np.random.normal(0, self.noise, (self.size))
-        np.random.seed()  # rerandomise seed
         return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
@@ -200,7 +182,7 @@ class Complex_Fourrier(Dataset):
 
 class MackeyGlass(Dataset):
     """A MackeyGlass time series regression dataset. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
-    `X` is a linspace between 0 and 10, and `y` is the corresponding MackeyGlass value at that time step
+    `X` is a linspace between :math:`0` and :math:`10`, and `y` is the corresponding MackeyGlass value at that time step
     """
 
     size: int
@@ -272,43 +254,31 @@ class MackeyGlass(Dataset):
 
 class Random(Dataset):
     """A random regression dataset of uniformly uniform distribution between 0 and 1. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
-    2D arrays of shape `(size, 1)`. `X` is a linspace between 0 and :math:`2 \pi`, and `y` is a random uniform.
+    2D arrays of shape `(size, 1)`. `X` is a linspace between :math:`0` and :math:`2 \pi`, and `y` is a random uniform.
     """
-
-    seed: Optional[int]
-    """
-    @private
-    The seed parameter makes data generation deterministic. If None, the seed is not set."""
 
     size: int
     """
     @private
     The size parameter is the number of data points to generate."""
 
-    def __init__(self, size: int = 200, seed: Optional[int] = None) -> None:
+    def __init__(self, size: int = 200) -> None:
         """Initialises the dataset object with passed parameters.
 
         Parameters
         ----------
         size : int, optional
             The number of data points to generate. The default is 200.
+        """
 
-        Other Parameters
-        ----------------
-        seed : int, optional
-            Seed parameter to make data generation deterministic."""
-        self.seed = seed
         self.size = size
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         """
         @private
         Generates a random dataset of uniformly uniform distribution between 0 and 1."""
-        if self.seed:
-            np.random.seed(self.seed)
         xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.random.uniform(0, 1, (self.size,))
-        np.random.seed()  # rerandomise seed
         return xs, ys
 
     def get_train_test(self, test_size: float = 0.3) -> TrainTestSplit:
@@ -318,7 +288,7 @@ class Random(Dataset):
 
 
 class Sine(Dataset):
-    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between 0 and :math:`2 \pi`,
+    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between :math:`0` and :math:`2 \pi`,
     and `y` is the corresponding sine wave with gaussian noise added. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     """
 
@@ -332,7 +302,7 @@ class Sine(Dataset):
     @private
     The size parameter is the number of data points to generate."""
 
-    def __init__(self, size: int = 200, noise: float = 0.5) -> None:
+    def __init__(self, size: int = 200, noise: float = 0.1) -> None:
         r"""Initialises the dataset object with passed paramters.
 
         Parameters
@@ -340,7 +310,7 @@ class Sine(Dataset):
         size : int, optional
             The number of data points to generate. The default is 200.
         noise : float, optional
-            The magintude of noise to add to the sine wave. The default is 0.5.
+            The magintude of noise to add to the sine wave. The default is 0.1.
 
         """
         self.noise = noise

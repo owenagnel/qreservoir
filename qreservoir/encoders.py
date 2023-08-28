@@ -8,7 +8,9 @@ from qreservoir.abstract_base_classes import Encoder
 
 
 class CHEEncoder(Encoder):
-    """Simple Hardware Effecient Encoder class. Implements a
+    """Simple Hardware Effecient Encoder class.
+
+    Implements a
     reuploading stretegy using CZ and random pauli rotation gates
     with a cyclic entangling structure. Optionally multpile qubits per feature."""
 
@@ -80,8 +82,9 @@ class CHEEncoder(Encoder):
 
 
 class ExpEncoder(Encoder):
-    """Exponential Encoder class. Implements an expoential encoding scheme stretegy u
-    sing CZ and pauli-X rotation gates with a cyclic CZ entangling structure. Typically we
+    """Exponential Encoder class.
+
+    Implements an expoential encoding scheme stretegy using CZ and pauli-X rotation gates with a cyclic CZ entangling structure. Typically we
     have multiple qubits per feature, and single depth."""
 
     def __init__(
@@ -135,8 +138,9 @@ class ExpEncoder(Encoder):
 
 
 class HEEncoder(Encoder):
-    """Simple Hardware Effecient Encoder class. Implements a
-    reuploading stretegy using CZ and RX gates with a cyclic
+    """Simple Hardware Effecient Encoder class.
+
+    Implements a reuploading stretegy using CZ and RX gates with a cyclic
     entangling structure"""
 
     def __init__(
@@ -189,8 +193,9 @@ class HEEncoder(Encoder):
 
 
 class NoisyHEEncoder(Encoder):
-    """Simple Noisy Hardware Effecient Encoder class. Implements
-    a reuploading stretegy using CZ and RX gates with a cyclic
+    """Simple Noisy Hardware Effecient Encoder class.
+
+    Implements a reuploading stretegy using CZ and RX gates with a cyclic
     entangling structure with depolarizing noise by default.
 
     WORK IN PROGRESS"""
@@ -258,8 +263,11 @@ class NoisyHEEncoder(Encoder):
 
 
 class NonCorrelatedCHEE(Encoder):
-    """Non correlated case of CHE Encoder class. Each layer encodes a different set of features. Hence get_encoding_state() takes an input of shape (`depth`, `feature_num`).
-    .. deprecated
+    r"""Non correlated case of CHE Encoder class.
+
+    Each layer encodes a different set of features. Hence get_encoding_state() takes an input of shape (`depth`, `feature_num`).
+    .. deprecated:: 0.3.0
+        `NonCorrelatedCHEE` was used for testing only and doesn't fit the with the standard `Encoder` interface. Use `CHEEncoder` instead.
     """
 
     def __init__(

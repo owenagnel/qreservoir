@@ -58,10 +58,19 @@ class QELModel:
     def calculate_observable_expectations(
         self, input_vec: NDArray[np.double]
     ) -> NDArray[np.double]:
-        """Calculates the list of observable values after dynamics given
-        an array_like input of size (n_features) and initial state. Returns
-        1d array_like of size (n_observables)"""
+        r"""Calculates the list of observable values after dynamics given
+        an array of inputs and predefined initial state. Returns the list of observable expectations.
 
+        Parameters
+        ----------
+        input_vec : NDArray[np.double]
+            A 1d array of input values of shape `(encoder.feature_num,)` to be passed to the reservoir.
+
+        Returns
+        -------
+        NDArray[np.double]
+            A 1d array of observable expectations with shape `(len(observables),)` after encoding and dynamics.
+        """
         # calculate the next state of the reservoir
         output_state = self.reservoir.get_reservoir_state(input_vec, self.initial_state)
         # calculate the list of observable values
@@ -74,8 +83,19 @@ class QELModel:
     def batch_calculate_observable_expectations(
         self, input_vecs: NDArray[np.double]
     ) -> NDArray[np.double]:
-        """Calculates observable values for an array_like batch of input vectors
-        of size (n_samples, n_features)."""
+        r"""Calculates a batch of observable expectation values after dynamics given an batch of inputs
+        and a predefined initial state. Returns the list of observable expectations.
+
+        Parameters
+        ----------
+        input_vecs : NDArray[np.double]
+            A 2d array of input values of shape `(n_samples, encoder.feature_num)` to be passed to the reservoir.
+
+        Returns
+        -------
+        NDArray[np.double]
+            A 2d array of observable expectations with shape `(n_samples, len(observables))` after encoding and dynamics.
+        """
 
         outputs = []
         for input_vec in input_vecs:
@@ -83,8 +103,17 @@ class QELModel:
         return np.array(outputs)
 
     def fit(self, X: NDArray[np.double], y: NDArray[np.double]) -> None:
-        """X is an array_like of (n_samples, n_features), fit trains a model to
-        predict a new output, note y must be a 1_d array_like with shape (n_samples,)"""
+        r"""Takes a training dataset and fits the QELM model using the subestimator passed at creation
+
+        Parameters
+        ----------
+        X : NDArray[np.double]
+            A 2d array of input values of shape `(n_samples, encoder.feature_num)`.
+
+        y : NDArray[np.double]
+            A 1d array of target values of shape `(n_samples,)`. Note that `scikit-learn` allows for multivariate outputs, so a
+            y with shape `(n_samples, n_outputs)` is also valid. However, the method will raise a warning and this approach is not in general recommended.
+        """
 
         check_array(X)
         prepared_data = self.batch_calculate_observable_expectations(X)
@@ -93,8 +122,19 @@ class QELModel:
         self.is_fitted_ = True
 
     def predict(self, X: NDArray[np.double]) -> NDArray[np.double]:
-        """X is an array_like of (n_samples, n_features), returns the predicted
-        output shape (n_samples,)"""
+        r"""Returns the output values predicted by the QELM model.
+
+        Parameters
+        ----------
+        X : NDArray[np.double]
+            A 2d array of input values of shape `(n_samples, encoder.feature_num)`.
+
+        Returns
+        -------
+        NDArray[np.double]
+            A 1d array of predicted values of shape `(n_samples,)`. (note that if the model was
+            fitted with mutlivariate outputs, the shape will be `(n_samples, n_outputs)`)
+        """
 
         check_array(X)
         check_is_fitted(self, "is_fitted_")
@@ -102,8 +142,22 @@ class QELModel:
         return self.subestimator.predict(expections)
 
     def score(self, X: NDArray[np.double], y: NDArray[np.double]) -> np.double:
-        """Returns the R^2 score of the model on the input sequence
-        X and target sequence y"""
+        r"""Returns R^2 score of the model on the test data.
+
+        Parameters
+        ----------
+        X : NDArray[np.double]
+            A 2d array of input values of shape `(n_samples, encoder.feature_num)`.
+
+        y : NDArray[np.double]
+            A 1d array of target values of shape `(n_samples,)`. Note that `scikit-learn` allows for multivariate outputs, so a
+            y with shape `(n_samples, n_outputs)` is also valid. However, the method will raise a warning and this approach is not in general recommended.
+
+        Returns
+        -------
+        np.double
+            The R^2 score of the model on the test data.
+        """
 
         check_X_y(X, y)
         y_pred = self.predict(X)
@@ -126,6 +180,22 @@ class RCModel:
         subestimator: BaseEstimator,
         initial_state: Optional[DensityMatrix] = None,
     ) -> None:
+        r"""Initialises the QELM model given a reservoir and estimator.
+
+        Parameters
+        ----------
+        reservoir : Reservoir
+            The reservoir, encoder pair to be used by the model.
+        observables : List[Observable]
+            A list of user defined qulacs 'Observable` objects.
+        subestimator : BaseEstimator
+            A `scikit-learn` estimator to fit the data once processed by the reservoir.
+
+        Other Parameters
+        ----------------
+        initial_state : QuantumState, optional
+            The initial state of the reservoir hidden space, by default None. Must be the same size as the reservoir ancillas.
+        """
         self.reservoir = reservoir
         self.observables = observables
         self.subestimator = subestimator
@@ -138,9 +208,25 @@ class RCModel:
     def calculate_observables_for_sequence(
         self, input_seq: NDArray[np.double], index: Optional[int] = None
     ) -> NDArray[np.double]:
-        """Takes a (n_samples, n_features) dimensional input sequence and returns an
-        (n_samples, n_observables) array of observable values. If index is specified,
-        only the observable values for the indexth sample will be returned."""
+        r"""Takes a time series input sequence and returns an array of observable values expectations
+        for each time step. If index is specified, only the observable values for the indexth
+        sample will be returned.
+
+        Parameters
+        ----------
+        input_seq : NDArray[np.double]
+            A 2d array of input values of shape `(n_timesteps, encoder.feature_num)`.
+
+        Other Parameters
+        ----------------
+        index : int, optional
+            The index of the timestep to return the observable values for, by default None. If None, the observable values for all timesteps will be returned.
+
+        Returns
+        -------
+        NDArray[np.double]
+            A 2d array of observable expectations with shape `(n_timesteps, len(observables))` after encoding and dynamics. Note that if `index` is specified, the shape will be `(1, len(observables))`
+        """
 
         if index and (index < 0 or index >= len(input_seq)):
             raise ValueError("index must be between 0 and len(input_seq) - 1")
@@ -168,7 +254,24 @@ class RCModel:
     def next_reservoir_state_with_observables(
         self, prev: DensityMatrix, sequent: NDArray[np.double]
     ) -> Tuple[NDArray[np.double], DensityMatrix]:
-        """Calculates the next state of the reservoir and the list of observable values"""
+        r"""Takes a single timestep input (`sequent`) and the previous state of the reservoir and returns the next state of the reservoir and the list of observable values.
+
+        Parameters
+        ----------
+        prev : DensityMatrix
+            The state of the reservoir at the previous timestep. (Note that the dimension of this state must be that of teh hidden space of the reservoir)
+
+        sequent : NDArray[np.double]
+            A 1d array of input values of shape `(encoder.feature_num,)` to be passed to the reservoir.
+
+        Returns
+        -------
+        NDArray[np.double]
+            A 2d array of observable expectations with shape `(len(observables),)` after encoding and dynamics.
+
+        DensityMatrix
+            The state of the reservoir after dynamics with encoding qubits traceds out.
+        """
 
         # calculate the next state of the reservoir
         output_state = self.reservoir.get_reservoir_state(sequent, prev)
@@ -187,7 +290,22 @@ class RCModel:
     def next_reservoir_state(
         self, prev: DensityMatrix, sequent: NDArray[np.double]
     ) -> DensityMatrix:
-        """Calculates only the next state of the reservoir"""
+        r"""Calculates only the next state of the reservoir without expectation values (used as helper function).
+
+        Parameters
+        ----------
+        prev : DensityMatrix
+            The state of the reservoir at the previous timestep. (Note that the dimension of this state must be that of teh hidden space of the reservoir)
+
+        sequent : NDArray[np.double]
+            A 1d array of input values of shape `(encoder.feature_num,)` to be passed to the reservoir.
+
+        Returns
+        -------
+        DensityMatrix
+            The state of the reservoir after dynamics with encoding qubits traceds out.
+        """
+
         output_state = self.reservoir.get_reservoir_state(sequent, prev)
         if self.reservoir.get_ancilla_num():
             prev = partial_trace(
@@ -200,9 +318,25 @@ class RCModel:
 
     def fit(
         self, X: NDArray[np.double]
-    ) -> None:  # TODO, allow for multiple sequence to be input, for more training data
+    ) -> None:  # TODO, allow for multiple sequence to be inputfor more training data
         """X is an array_like of (n_samples, n_features), fit trains a model to
         predict the next value of the time series."""
+
+        r"""Takes a training dataset and fits the QELM model using the subestimator passed at creation
+
+        Parameters
+        ----------
+        X : NDArray[np.double]
+            A 2d array of input values of shape `(n_timesteps, encoder.feature_num)`.
+
+        Notes
+        -----
+        The target values are assumed to be the next value in the sequence. (i.e. if the input sequence is [[1],[2],[3],[4],[5]], the target sequence is [[2],[3],[4],[5],[6]]).
+        This means that the scikit-learn estimator will return an array rather than a scalar value when asked to predict. Hence, the number of encoding features and predicted
+        features are assumed to be identical. I.e. `encoder.feature_num` = `n_outputs`.
+
+        This method should also be updated to take a batch of training data sequences rather than a single one (i.e. X should be a 3d array)
+        """
 
         check_array(X)
         y = X[1:]
@@ -215,10 +349,23 @@ class RCModel:
     def predict(
         self, X: NDArray[np.double], additional_samples: int
     ) -> NDArray[np.double]:
-        """Takes an input sequence X and returns the predicted next values of the sequence.
-        'additional_samples' is the numer of additional datapoints the model will predict.
-        (i.e. if additional_samples is 0, the model will return an array of prediction the
-        same size as the input sequence)"""
+        r"""Takes an input sequence X and returns the predicted next values of the sequence predicted by the model.
+
+        Parameters
+        ----------
+        X : NDArray[np.double]
+            A 2d array of input values of shape `(n_timesteps, encoder.feature_num)`.
+
+        additional_samples : int
+            The number of additional samples to predict after the input sequence. (note that this means
+            if additional_samples is 0, the model will return an array of prediction the
+            same size as the input sequence)
+
+        Returns
+        -------
+        NDArray[np.double]
+            A 2d array of predicted values of shape `(n_timesteps + additional_samples, encoder.feature_num)`.
+        """
 
         check_array(X)
         check_is_fitted(self, "is_fitted_")
@@ -239,10 +386,31 @@ class RCModel:
         return np.array(outputs)
 
     def score(self, X: NDArray[np.double], y: NDArray[np.double]) -> np.double:
-        """Returns the R^2 score of the model on the input sequence X and
-        target sequence y"""
+        r"""Returns R^2 score of the model on the test data. X is a truncated time series and y is the full sequences.
+
+        Parameters
+        ----------
+        X : NDArray[np.double]
+            A 2d array of input values of shape `(n_timesteps, encoder.feature_num)`.
+
+        y : NDArray[np.double]
+           A 2d array of input values of shape `(n_test_timesteps, encoder.feature_num)`. With n_test_timesteps > n_timesteps
+
+        Returns
+        -------
+        np.double
+            The R^2 score of the model on the test data.
+
+        Raises
+        ------
+        ValueError
+            If the length of y is less than the length of X.
+        """
 
         additional_samples = len(y) - len(X)
+        if additional_samples < 0:
+            raise ValueError("y must be at least as long as X")
+
         check_X_y(X, y, multi_output=True)
         y_pred = self.predict(X, additional_samples)
         u = ((y - y_pred) ** 2).sum()
