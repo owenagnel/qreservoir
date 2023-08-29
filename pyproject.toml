@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qreservoir"
-version = "0.4.2"
+version = "0.5.0"
 description = "Python package for quantum reservoir computing using Qulacs"
 authors = ["Owen Agnel <owen.agnel@gmail.com>"]
 readme = "README.md"
