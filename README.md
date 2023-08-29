@@ -67,7 +67,7 @@ print(model.score(X, y))
 
 ## How to cite
 
-N/A
+Please cite the original qulacs arXiv paper: [Qulacs: a fast and versatile quantum circuit simulator for research purpose](https://arxiv.org/abs/2011.13524)
 
 ## Future improvements
 
