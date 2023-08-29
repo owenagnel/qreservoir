@@ -81,3 +81,12 @@ def test_returned_circuit_dimensions_multi_enc_qubit() -> None:
     assert circuit.get_qubit_count() == 12
     assert circuit.get_gate_count() == 24
     assert circuit.calculate_depth() == 13
+
+
+# test that the circuit returns the same state when called twice on same input
+def test_circuit_reproducibility() -> None:
+    encoder = CHEEncoder(3, 4)
+    input_vect = np.random.uniform(0, 2 * np.pi, 3)
+    state = encoder.get_encoding_state(input_vect)
+    state2 = encoder.get_encoding_state(input_vect)
+    assert state.get_vector() == pytest.approx(state2.get_vector())

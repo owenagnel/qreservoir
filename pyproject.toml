@@ -45,5 +45,5 @@ exclude = [
 
 
 [[tool.mypy.overrides]]
-module = ['qulacsvis.*', 'sklearn.*', 'matplotlib.*']
+module = ['qulacsvis.*', 'sklearn.*', 'matplotlib.*', 'scipy.*']
 ignore_missing_imports = true
