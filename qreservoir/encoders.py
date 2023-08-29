@@ -228,10 +228,11 @@ class ExpEncoder(Encoder):
 
         circuit = QuantumCircuit(self.qubit_num)
         for _ in range(self.depth):
-            for f in range(self.feature_num):
-                for i in range(self.qubits_per_feature):
-                    rot_angle = (3**i) * input_vect[f]
-                    circuit.add_gate(RotX(i, rot_angle))
+            for i in range(self.feature_num):
+                for j in range(self.qubits_per_feature):
+                    rot_angle = (3**j) * input_vect[i]
+                    qubit_acted_on = i * self.qubits_per_feature + j
+                    circuit.add_gate(RotX(qubit_acted_on, rot_angle))
             for i in range(self.qubit_num - 1):
                 circuit.add_gate(CZ(i, i + 1))
             if self.qubit_num > 1:
@@ -477,7 +478,7 @@ class Noisy_CHEEncoder(Encoder):
             raise ValueError("Pauli noise needs 3 noise parameters")
 
     def get_circuit(self, input_vect: NDArray[np.double]) -> QuantumCircuit:
-        """Function to create the entire noisy circuit
+        """Generates the noisy circuit for the given input array
 
         Parameters
         ---------
@@ -561,7 +562,9 @@ class Noisy_CHEEncoder(Encoder):
 
     def print_circuit(self) -> None:
         """Prints the circuit diagram of the reservoir using `qulacsvis` package"""
-        circuit = self.get_circuit(np.random.uniform(size=self.feature_num))
+        circuit = self.get_circuit(
+            np.random.uniform(size=(self.num_unitaries, self.feature_num))
+        )
         circuit_drawer(circuit)
 
     def get_feature_num(self) -> int:
@@ -578,6 +581,7 @@ class NonCorrelatedCHEE(Encoder):
     r"""Non correlated case of CHE Encoder class.
 
     Each layer encodes a different set of features. Hence get_encoding_state() takes an input of shape (`depth`, `feature_num`).
+
     .. deprecated:: 0.3.0
         `NonCorrelatedCHEE` was used for testing only and doesn't fit the with the standard `Encoder` interface. Use `CHEEncoder` instead.
     """
