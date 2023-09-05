@@ -4,7 +4,8 @@ from typing import List, Optional, Tuple, Union, cast
 import numpy as np
 from numpy.typing import NDArray
 from qulacs import DensityMatrix, QuantumCircuit, QuantumGateBase, QuantumState
-from qulacs.gate import CNOT, CZ, DenseMatrix, RandomUnitary, RotX, RotY, RotZ, X, Z
+from qulacs.gate import (CNOT, CZ, DenseMatrix, RandomUnitary, RotX, RotY,
+                         RotZ, X, Z)
 from qulacs.state import tensor_product
 from qulacsvis import circuit_drawer
 

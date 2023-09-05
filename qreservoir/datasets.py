@@ -1,3 +1,4 @@
+import random
 from typing import Tuple
 
 import numpy as np
@@ -143,8 +144,17 @@ class Complex_Fourrier(Dataset):
     @private
     The complexity parameter is the number of cos and sin terms in the fourrier series."""
 
+    sparisty: float
+    """
+    @private
+    The sparisty parameter is the fraction of terms in the fourrier series to set to zero."""
+
     def __init__(
-        self, size: int = 200, noise: float = 0.1, complexity: int = 5
+        self,
+        size: int = 200,
+        noise: float = 0.1,
+        complexity: int = 5,
+        sparisty: float = 1.0,
     ) -> None:
         r"""Initialises the dataset object with passed parameters.
 
@@ -156,21 +166,26 @@ class Complex_Fourrier(Dataset):
             The standard deviation of noise to add to the fourrier series. The default is 0.1.
         complexity : int, optional
             The number of terms in the fourrier series. The default is 5.
+        sparisty : float, optional
+            The ratio of terms in the fourrier series to set to zero. The default is 1.0.
         """
         self.noise = noise
         self.size = size
         self.complexity = complexity
+        self.sparisty = sparisty
+        self.num_frequencies = int(self.complexity * self.sparisty)
 
     def generate_data(self) -> Tuple[NDArray[np.double], NDArray[np.double]]:
         """
         @private
         Generates a truncated random fourrier series."""
-        self.random_coef = np.random.uniform(-1, 1, (self.complexity, 2))
+        self.random_coef = np.random.uniform(-1, 1, (self.num_frequencies, 2))
         xs = np.reshape(np.linspace(0, 2 * np.pi, self.size), (self.size, 1))
         ys = np.zeros(self.size)
-        for i in range(self.complexity):
-            ys = np.add(self.random_coef[i][0] * np.sin((i + 1) * xs[:, 0]), ys)
-            ys = np.add(self.random_coef[i][1] * np.cos((i + 1) * xs[:, 0]), ys)
+        frequencies = random.sample(list(range(self.complexity)), self.num_frequencies)
+        for i, freq in enumerate(frequencies):
+            ys = np.add(self.random_coef[i][0] * np.sin((freq + 1) * xs[:, 0]), ys)
+            ys = np.add(self.random_coef[i][1] * np.cos((freq + 1) * xs[:, 0]), ys)
         ys += np.random.normal(0, self.noise, (self.size))
         return xs, ys
 
@@ -253,7 +268,7 @@ class MackeyGlass(Dataset):
 
 
 class Random(Dataset):
-    """A random regression dataset of uniformly uniform distribution between 0 and 1. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
+    r"""A random regression dataset of uniformly uniform distribution between 0 and 1. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     2D arrays of shape `(size, 1)`. `X` is a linspace between :math:`0` and :math:`2 \pi`, and `y` is a random uniform.
     """
 
@@ -288,7 +303,7 @@ class Random(Dataset):
 
 
 class Sine(Dataset):
-    """The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between :math:`0` and :math:`2 \pi`,
+    r"""The sine regression dataset is a sine wave with gaussian noise added. `X` is a linspace between :math:`0` and :math:`2 \pi`,
     and `y` is the corresponding sine wave with gaussian noise added. `X` is 2D arrays of shape `(size, 1)` and `y` os a 1D array of shape `(size,)`.
     """
 
