@@ -25,7 +25,7 @@ class QELModel:
         observables: List[Observable],
         subestimator: BaseEstimator,
         initial_state: Optional[QuantumState] = None,
-        samples: int = 1
+        samples: int = 1,
     ) -> None:
         r"""Initialises the QELM model given a reservoir and estimator.
 
@@ -76,13 +76,22 @@ class QELModel:
             A 1d array of observable expectations with shape `(len(observables),)` after encoding and dynamics.
         """
         # calculate the next state of the reservoir
-        #output_state = self.reservoir.get_reservoir_state(input_vec, self.initial_state)
+        # output_state = self.reservoir.get_reservoir_state(input_vec, self.initial_state)
         # calculate the list of observable values
         expectations = np.array(
-            [[ob.get_expectation_value(self.reservoir.get_reservoir_state(input_vec, self.initial_state))
-               for ob in self.observables] for _ in range(self.samples)]
+            [
+                [
+                    ob.get_expectation_value(
+                        self.reservoir.get_reservoir_state(
+                            input_vec, self.initial_state
+                        )
+                    )
+                    for ob in self.observables
+                ]
+                for _ in range(self.samples)
+            ]
         )
-        expectations = np.mean(expectations, axis = 0)
+        expectations = np.mean(expectations, axis=0)
 
         return expectations
 

@@ -2,10 +2,9 @@ from typing import List
 
 import numpy as np
 from numpy.typing import NDArray
-from qulacs import QuantumCircuit, QuantumGateBase, QuantumState, NoiseSimulator
-from qulacs.gate import CPTP, CZ, RotX, RotY, RotZ, SparseMatrix
+from qulacs import QuantumCircuit, QuantumGateBase, QuantumState
+from qulacs.gate import CZ, RotX, RotY, RotZ
 from qulacsvis import circuit_drawer
-from scipy.sparse import csc_matrix
 
 from qreservoir.abstract_base_classes import Encoder
 
@@ -553,7 +552,6 @@ class HEEncoder(Encoder):
         int
             Number of features to be encoded"""
         return self.feature_num
-
 
 
 class NonCorrelatedCHEE(Encoder):
